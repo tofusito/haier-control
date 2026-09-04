@@ -285,9 +285,13 @@ class HaierCloudDriver:
             raise DriverUnavailable("Haier command schema is unavailable")
         device.commands = {key: value for key, value in payload.items() if key != "resultCode"}
         settings = self._settings_parameters(device)
+        settings_command = device.commands.get("settings")
         _LOGGER.info(
-            "Haier command schema payload_keys=%s settings_keys=%s",
+            "Haier command schema payload_keys=%s settings_type=%s settings_command_keys=%s "
+            "settings_keys=%s",
             sorted(device.commands.keys()),
+            type(settings_command).__name__,
+            sorted(settings_command.keys()) if isinstance(settings_command, dict) else None,
             sorted(settings.keys()) if isinstance(settings, dict) else type(settings).__name__,
         )
         temp_value = settings.get("tempSel")
