@@ -1,0 +1,15 @@
+.DS_Store
+.env
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.py[cod]
+*.db
+*.db-shm
+*.db-wal
+data/
+secrets/
+htmlcov/
+.coverage

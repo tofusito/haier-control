@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#09111f" />
+    <meta name="color-scheme" content="dark" />
+    <title>Clima · Haier Control</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="ambient" aria-hidden="true"></div>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">MI CASA</p>
+        <h1>Clima</h1>
+      </div>
+      <button id="connectionButton" class="status-pill" type="button" aria-label="Estado de conexión">
+        <span class="status-dot"></span><span id="connectionLabel">Conectando</span>
+      </button>
+    </header>
+
+    <main>
+      <section id="errorBanner" class="banner hidden" role="alert"></section>
+      <section id="devices" class="device-grid" aria-live="polite">
+        <article class="skeleton-card"></article>
+        <article class="skeleton-card"></article>
+      </section>
+    </main>
+
+    <dialog id="tokenDialog" class="sheet token-sheet">
+      <form id="tokenForm" method="dialog">
+        <div class="sheet-handle" aria-hidden="true"></div>
+        <p class="eyebrow">ACCESO LOCAL</p>
+        <h2>Conecta este dispositivo</h2>
+        <p class="muted">
+          Pega un token local con permisos <code>read</code>, <code>control</code> y
+          <code>timers</code>. No uses tu contraseña de hOn aquí.
+        </p>
+        <label>
+          Token de API
+          <input id="apiToken" type="password" autocomplete="off" required placeholder="hc_…" />
+        </label>
+        <label class="check-row">
+          <input id="rememberToken" type="checkbox" />
+          <span>Recordar en este navegador</span>
+        </label>
+        <p id="tokenError" class="field-error" role="alert"></p>
+        <button class="primary wide" type="submit">Entrar</button>
+        <p class="security-note">
+          La opción más segura para el primer token es la CLI dentro del contenedor. HTTP
+          en una LAN no cifra el tráfico; para redes no confiables usa HTTPS local.
+        </p>
+      </form>
+    </dialog>
+
+    <dialog id="haierSetupDialog" class="sheet token-sheet">
+      <form id="haierSetupForm" method="dialog" autocomplete="on">
+        <div class="sheet-handle" aria-hidden="true"></div>
+        <p class="eyebrow" id="setupEyebrow">CONFIGURACIÓN INICIAL</p>
+        <h2 id="setupTitle">Conectar con hOn</h2>
+        <p class="muted">
+          Este es un formulario propio de Haier Control: el servidor habla directamente con
+          hOn. No es una página oficial incrustada.
+        </p>
+        <div class="banner setup-warning">
+          Esta primera versión usa HTTP. Introduce credenciales solo desde una LAN de
+          confianza. Para máxima protección, usa la CLI o configura HTTPS local.
+        </div>
+        <div id="credentialsStep" class="field-grid">
+          <label>
+            Token de emparejamiento
+            <input id="pairingToken" type="password" autocomplete="off" required placeholder="Consulta el log del contenedor" />
+          </label>
+          <label>
+            Email de hOn
+            <input id="haierEmail" type="email" autocomplete="username" required />
+          </label>
+          <label>
+            Contraseña de hOn
+            <input id="haierPassword" type="password" autocomplete="current-password" required />
+          </label>
+        </div>
+        <div id="otpStep" class="field-grid hidden">
+          <p class="muted">hOn ha enviado un código al correo de la cuenta.</p>
+          <label>
+            Código de verificación
+            <input id="haierOtp" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" />
+          </label>
+          <button id="resendOtp" type="button" class="control-button">Reenviar código</button>
+        </div>
+        <p id="haierSetupError" class="field-error" role="alert"></p>
+        <button id="haierSetupSubmit" class="primary wide" type="submit">Conectar de forma segura</button>
+        <p class="security-note">
+          La contraseña solo vive en memoria durante el handshake. Se guardan únicamente
+          tokens de sesión cifrados; una reautenticación completa volverá a pedirla.
+        </p>
+      </form>
+    </dialog>
+
+    <dialog id="timerDialog" class="sheet">
+      <form id="timerForm" method="dialog">
+        <div class="sheet-handle" aria-hidden="true"></div>
+        <div class="sheet-title-row">
+          <div>
+            <p class="eyebrow">TEMPORIZADOR</p>
+            <h2 id="timerTitle">Programar</h2>
+          </div>
+          <button class="icon-button" value="cancel" aria-label="Cerrar" type="button" data-close>×</button>
+        </div>
+        <input id="timerDeviceId" type="hidden" />
+        <input id="timerEditId" type="hidden" />
+        <fieldset class="segmented">
+          <legend class="sr-only">Acción</legend>
+          <label><input type="radio" name="timerAction" value="off" checked /><span>Apagar</span></label>
+          <label><input type="radio" name="timerAction" value="on" /><span>Encender</span></label>
+        </fieldset>
+        <fieldset class="segmented compact">
+          <legend class="sr-only">Tipo de hora</legend>
+          <label><input type="radio" name="timerKind" value="relative" checked /><span>En unos minutos</span></label>
+          <label><input type="radio" name="timerKind" value="exact" /><span>A una hora</span></label>
+        </fieldset>
+        <div id="relativeFields" class="field-grid">
+          <label>Minutos<input id="timerMinutes" type="number" min="1" max="10080" value="30" /></label>
+          <div class="quick-times" aria-label="Tiempos rápidos">
+            <button type="button" data-minutes="15">15 m</button>
+            <button type="button" data-minutes="30">30 m</button>
+            <button type="button" data-minutes="60">1 h</button>
+            <button type="button" data-minutes="120">2 h</button>
+          </div>
+        </div>
+        <div id="exactFields" class="hidden">
+          <label>Fecha y hora<input id="timerExact" type="datetime-local" /></label>
+        </div>
+        <div id="onOptions" class="on-options hidden">
+          <div class="divider"></div>
+          <h3>Al encender</h3>
+          <div class="field-grid two">
+            <label>Modo<select id="timerMode"></select></label>
+            <label>Temperatura<input id="timerTemperature" type="number" inputmode="decimal" /></label>
+            <label>Ventilador<select id="timerFan"></select></label>
+          </div>
+        </div>
+        <p id="timerError" class="field-error" role="alert"></p>
+        <button class="primary wide" type="submit">Guardar temporizador</button>
+      </form>
+    </dialog>
+
+    <dialog id="moreDialog" class="sheet">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="sheet-title-row">
+        <div><p class="eyebrow">CONTROLES</p><h2 id="moreTitle">Más</h2></div>
+        <button class="icon-button" aria-label="Cerrar" type="button" data-close>×</button>
+      </div>
+      <div id="advancedControls" class="advanced-list"></div>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>

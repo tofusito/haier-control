@@ -1,0 +1,27 @@
+services:
+  haier-control:
+    build:
+      context: .
+    image: ${HAIER_CONTROL_IMAGE:-haier-control:dev}
+    container_name: haier-control
+    restart: unless-stopped
+    ports:
+      - "${HAIER_CONTROL_BIND_ADDRESS:-127.0.0.1}:${HAIER_CONTROL_PORT:-8787}:8787"
+    environment:
+      HAIER_DRIVER: ${HAIER_DRIVER:-mock}
+      HAIER_LOG_LEVEL: ${HAIER_LOG_LEVEL:-INFO}
+    volumes:
+      - ./data:/data
+    secrets:
+      - haier_control_master_key
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+secrets:
+  haier_control_master_key:
+    file: ./secrets/master_key

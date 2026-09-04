@@ -1,0 +1,21 @@
+# Merge under `services:` in the existing stack. Replace placeholders outside Git.
+  haier-control:
+    image: haier-control:deployed
+    container_name: haier-control
+    restart: unless-stopped
+    network_mode: bridge
+    ports:
+      - "<LAN_BIND_ADDRESS>:<LAN_PORT>:8787"
+    environment:
+      HAIER_DRIVER: haier-cloud
+      HAIER_LOG_LEVEL: INFO
+    volumes:
+      - <RUNTIME_ROOT>/data:/data
+      - <RUNTIME_ROOT>/secrets/master_key:/run/secrets/haier_control_master_key:ro
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
