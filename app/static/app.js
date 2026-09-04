@@ -2,9 +2,11 @@ const state = {
   token: sessionStorage.getItem("haierToken") || localStorage.getItem("haierToken") || "",
   devices: [], timers: [], eventAbort: null, setupFlow: null,
   selectedDeviceId: localStorage.getItem("haierSelectedDevice") || "",
-  pendingCommands: new Set(), optimisticSnapshots: new Map(), refreshPromise: null,
-  refreshTimer: null,
+  pendingCommands: new Set(), optimisticSnapshots: new Map(), acceptedCommands: new Map(), refreshPromise: null,
+  refreshTimer: null, timerMutations: new Map(),
 };
+let commandController;
+const REQUEST_TIMEOUT_MS = 10000;
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const modeMeta = {
@@ -80,6 +82,7 @@ function deviceCard(device) {
   const caps = device.capabilities; const timer = nextTimer(device.id);
   const pending = state.pendingCommands.has(device.id);
   const disabled = pending ? " disabled" : "";
+  const power = window.HaierUiState.presentPowerState(device, pending);
   const roomTemp = device.state.room_temperature == null ? "Sin dato de ambiente" : `Habitación ${formatTemperature(device.state.room_temperature)}°`;
   const target = formatTemperature(device.state.target_temperature);
   const modeChips = caps.modes.map(item => `<button class="chip ${device.state.mode === item ? "active" : ""}" data-command="set_mode" data-value="${item}"${disabled}>${escapeHtml(labels[item] || item)}</button>`).join("");
@@ -87,8 +90,8 @@ function deviceCard(device) {
   const timerHtml = timer ? `<span><strong>${timer.action === "on" ? "Encender" : "Apagar"} en <span data-countdown="${timer.execute_at}">${countdown(timer.execute_at)}</span></strong><small>${localTime(timer.execute_at)} · toca para editar</small></span><span class="timer-pulse"></span>` : `<span><strong>Temporizador</strong><small>Encender o apagar después</small></span><span>＋</span>`;
   return `<article class="device-card ${mode} ${device.id === state.selectedDeviceId ? "selected" : ""} ${pending ? "pending" : ""}" data-device="${device.id}" aria-busy="${pending}">
     <div class="card-content">
-      <div class="card-head"><div><div class="room-name">${escapeHtml(device.name)}</div><div class="mode-caption"><span class="mode-glyph">${glyph}</span><span>${pending ? "Actualizando…" : `${modeLabel}${device.state.stale ? " · dato antiguo" : ""}`}</span></div></div>
-      <button class="power" type="button" data-power aria-pressed="${Boolean(device.state.power)}" aria-label="${device.state.power ? "Apagar" : "Encender"} ${escapeHtml(device.name)}"${disabled}>⌁</button></div>
+      <div class="card-head"><div><div class="room-name">${escapeHtml(device.name)}</div><div class="mode-caption"><span class="mode-glyph">${glyph}</span><span>${power.label} · ${modeLabel}${device.state.stale ? " · dato antiguo" : ""}</span></div>${pending ? `<div class="sync-status" role="status" aria-live="polite"><span class="sync-spinner" aria-hidden="true"></span>${power.status}</div>` : ""}</div>
+      <button class="power" type="button" data-power aria-pressed="${power.pressed}" aria-label="${escapeHtml(power.ariaLabel)}"${disabled}><span class="power-symbol" aria-hidden="true">⏻</span></button></div>
       <div class="temperature-block"><div><div class="target-temp">${target}<sup>°</sup></div><div class="room-temp">${roomTemp}</div></div></div>
       ${caps.temperature_min != null ? `<div class="temp-controls"><button data-temp="down" aria-label="Bajar temperatura"${disabled}>−</button><button data-temp="up" aria-label="Subir temperatura"${disabled}>＋</button></div>` : ""}
       ${modeChips ? `<div class="control-section"><div class="control-label"><span>Modo</span><span>${modeLabel}</span></div><div class="chips">${modeChips}</div></div>` : ""}
@@ -114,45 +117,8 @@ function bindCards() {
   });
 }
 
-function applyOptimistic(device, operation, value, key) {
-  if (!state.optimisticSnapshots.has(device.id)) {
-    state.optimisticSnapshots.set(device.id, JSON.parse(JSON.stringify(device.state)));
-  }
-  switch (operation) {
-    case "power": device.state.power = Boolean(value); break;
-    case "set_mode": device.state.mode = value; break;
-    case "set_temperature": device.state.target_temperature = Number(value); break;
-    case "set_fan": device.state.fan_mode = value; break;
-    case "set_vertical_swing": device.state.vertical_swing = value; break;
-    case "set_horizontal_swing": device.state.horizontal_swing = value; break;
-    case "set_advanced": device.state.advanced = { ...device.state.advanced, [key]: Boolean(value) }; break;
-  }
-  device.state.updated_at = new Date().toISOString();
-  device.state.stale = false;
-  state.pendingCommands.add(device.id);
-  render();
-}
-
-function restoreOptimistic(device) {
-  const snapshot = state.optimisticSnapshots.get(device.id);
-  if (snapshot) device.state = snapshot;
-  state.optimisticSnapshots.delete(device.id);
-  state.pendingCommands.delete(device.id);
-  render();
-}
-
-async function send(deviceId, operation, value, key = null) {
-  const device = state.devices.find(item => item.id === deviceId);
-  if (!device || state.pendingCommands.has(deviceId)) return;
-  applyOptimistic(device, operation, value, key);
-  try {
-    const result = await api(`/api/v1/devices/${deviceId}/commands`, { method:"POST", body:JSON.stringify({ operation, value, key }) });
-    if (!result.accepted) { restoreOptimistic(device); toast(result.message); return; }
-    if (result.state) device.state = result.state;
-    state.optimisticSnapshots.delete(deviceId); state.pendingCommands.delete(deviceId); render();
-    toast("Cambio confirmado");
-    queueRefresh(1200);
-  } catch (error) { restoreOptimistic(device); showError(error.message); }
+function send(deviceId, operation, value, key = null) {
+  return commandController.send(deviceId, operation, value, key);
 }
 
 function openTimer(device) {
@@ -188,24 +154,79 @@ async function saveTimer(event) {
   const executeAt = exact ? new Date($("#timerExact").value) : new Date(Date.now() + Number($("#timerMinutes").value)*60000);
   if (Number.isNaN(executeAt.getTime()) || executeAt <= new Date()) { $("#timerError").textContent = "Elige una hora futura."; return; }
   const command = action === "on" ? { mode:$("#timerMode").value, temperature:Number($("#timerTemperature").value), ...($("#timerFan").value ? {fan_mode:$("#timerFan").value} : {}) } : {};
+  const original = editId ? state.timers.find(item => item.id === editId) : null;
+  const localId = editId || temporaryTimerId();
+  const now = new Date().toISOString();
+  const optimistic = {
+    id: localId, device_id: deviceId, action, execute_at: executeAt.toISOString(), status: "scheduled",
+    command, idempotency_key: original?.idempotency_key || localId, created_at: original?.created_at || now,
+    updated_at: now, executed_at: null, error: null,
+  };
+  state.timerMutations.set(localId, { kind: "save", optimistic, original });
+  state.timers = state.timers.filter(item => item.id !== localId && item.id !== editId).concat(optimistic);
+  $("#timerDialog").close(); render(); toast("Guardando temporizador…");
   try {
     const saved = editId
-      ? await api(`/api/v1/timers/${editId}`, { method:"PATCH", body:JSON.stringify({ execute_at:executeAt.toISOString(), command }) })
-      : await api("/api/v1/timers", { method:"POST", body:JSON.stringify({ device_id:deviceId, action, execute_at:executeAt.toISOString(), command }) });
-    state.timers = state.timers.filter(item => item.id !== saved.id).concat(saved);
-    $("#timerDialog").close(); render(); toast(editId ? "Temporizador actualizado" : "Temporizador programado");
-  } catch (error) { $("#timerError").textContent = error.message; }
+      ? await apiWithTimeout(`/api/v1/timers/${editId}`, { method:"PATCH", body:JSON.stringify({ execute_at:executeAt.toISOString(), command }) })
+      : await apiWithTimeout("/api/v1/timers", { method:"POST", body:JSON.stringify({ device_id:deviceId, action, execute_at:executeAt.toISOString(), command }) });
+    state.timerMutations.delete(localId);
+    state.timers = state.timers.filter(item => item.id !== localId && item.id !== saved.id).concat(saved);
+    render(); toast(editId ? "Temporizador actualizado" : "Temporizador programado");
+  } catch (error) {
+    state.timerMutations.delete(localId);
+    state.timers = state.timers.filter(item => item.id !== localId);
+    if (original) state.timers.push(original);
+    render();
+    if (error.timedOut) { showError("No se pudo confirmar el temporizador. Puedes reintentarlo."); toast("Temporizador sin confirmar · reintenta"); }
+    else showError(error.message || "No se pudo guardar el temporizador. Puedes reintentarlo.");
+  }
+}
+
+function temporaryTimerId() {
+  return `pending-${globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`}`;
+}
+
+async function apiWithTimeout(path, options = {}) {
+  const controller = new AbortController();
+  let timedOut = false;
+  let rejectTimeout;
+  const timeoutPromise = new Promise((_, reject) => { rejectTimeout = reject; });
+  const timeoutId = setTimeout(() => {
+    timedOut = true; controller.abort();
+    const timeout = new Error("request-timeout"); timeout.name = "AbortError"; rejectTimeout(timeout);
+  }, REQUEST_TIMEOUT_MS);
+  try {
+    const request = api(path, { ...options, signal: controller.signal });
+    return await Promise.race([request, timeoutPromise]);
+  }
+  catch (error) {
+    if (timedOut || controller.signal.aborted) { const timeout = new Error("request-timeout"); timeout.timedOut = true; throw timeout; }
+    throw error;
+  } finally { clearTimeout(timeoutId); }
 }
 
 async function deleteTimer() {
   const timerId = $("#timerEditId").value;
   if (!timerId || !window.confirm("¿Eliminar este temporizador?")) return;
+  const original = state.timers.find(item => item.id === timerId);
+  if (!original) return;
+  const optimistic = { ...original, status: "cancelled", updated_at: new Date().toISOString() };
+  state.timerMutations.set(timerId, { kind: "delete", optimistic, original });
+  state.timers = state.timers.filter(item => item.id !== timerId).concat(optimistic);
   const button = $("#deleteTimerButton"); button.disabled = true;
+  $("#timerDialog").close(); render(); toast("Eliminando temporizador…");
   try {
-    const deleted = await api(`/api/v1/timers/${timerId}`, { method:"DELETE" });
+    const deleted = await apiWithTimeout(`/api/v1/timers/${timerId}`, { method:"DELETE" });
+    state.timerMutations.delete(timerId);
     state.timers = state.timers.filter(item => item.id !== deleted.id).concat(deleted);
-    $("#timerDialog").close(); render(); toast("Temporizador eliminado");
-  } catch (error) { $("#timerError").textContent = error.message; }
+    render(); toast("Temporizador eliminado");
+  } catch (error) {
+    state.timerMutations.delete(timerId);
+    state.timers = state.timers.filter(item => item.id !== timerId).concat(original);
+    render();
+    if (error.timedOut) { showError("No se pudo confirmar la eliminación. Puedes reintentarlo."); toast("Eliminación sin confirmar · reintenta"); }
+    else showError(error.message || "No se pudo eliminar el temporizador. Puedes reintentarlo.");
+  }
   finally { button.disabled = false; }
 }
 
@@ -272,9 +293,8 @@ async function refresh() {
   state.refreshPromise = (async () => {
     try {
       const [devices, timers] = await Promise.all([api("/api/v1/devices"), api("/api/v1/timers?include_finished=true")]);
-      const previous = new Map(state.devices.map(device => [device.id, device]));
-      state.devices = devices.map(device => state.pendingCommands.has(device.id) ? (previous.get(device.id) || device) : device);
-      state.timers = timers; showError(""); render(); setConnection(true, "En línea");
+      state.devices = commandController.reconcileDevices(devices);
+      state.timers = window.HaierUiState.mergeTimerMutations(timers, state.timerMutations); showError(""); render(); setConnection(true, "En línea");
     } catch (error) { if (error.message !== "unauthorized") { showError(error.message); setConnection(false, "Degradado"); } }
     finally { state.refreshPromise = null; }
   })();
@@ -302,6 +322,8 @@ async function connectEvents() {
     }
   } catch (error) { if (error.name !== "AbortError") setTimeout(connectEvents, 5000); }
 }
+
+commandController = window.HaierUiState.createCommandController({ state, api, render, showError, toast, queueRefresh });
 
 $("#tokenForm").addEventListener("submit", saveToken); $("#timerForm").addEventListener("submit", saveTimer); $("#deleteTimerButton").addEventListener("click", deleteTimer); $("#haierSetupForm").addEventListener("submit", saveHaierSetup); $("#resendOtp").addEventListener("click", resendOtp);
 $$('input[name=timerKind], input[name=timerAction]').forEach(input => input.addEventListener("change", syncTimerFields));

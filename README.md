@@ -12,9 +12,13 @@ on/off timers without depending on Home Assistant at runtime.
 
 - Responsive mobile dashboard with mode-specific visual language, target and room
   temperature, fan, swing, advanced controls, reduced-motion support, and honest stale or
-  degraded states.
+  degraded states. Mobile uses a compact AC selector with a preview for each unit.
+- Controls update optimistically while the cloud confirms. Power, temperature, mode, fan,
+  swing, and advanced settings prevent duplicate taps, show synchronization, and roll back
+  with a retry message after a rejected or timed-out request.
 - Persistent timers to turn a unit on or off after N minutes or at an exact date/time.
-  Turn-on timers may include mode, target temperature, fan, swing, and advanced options.
+  Turn-on timers may include mode, target temperature, fan, swing, and advanced options;
+  scheduled timers can be edited or cancelled without deleting their audit history.
 - Stable versioned API for devices, commands, timers, SSE updates, and authenticated
   OpenAPI at `/api/v1/openapi.json`.
 - API tokens are random and authenticated by keyed hashes, with `read`, `control`, and

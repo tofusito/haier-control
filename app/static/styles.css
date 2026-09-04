@@ -58,7 +58,8 @@ h3 { font-size: .95rem; color: var(--muted); text-transform: uppercase; letter-s
 @keyframes shimmer { to { background-position-x: -220%; } }
 .device-card { position: relative; isolation: isolate; transition: border-color .35s ease, transform .35s ease; }
 .device-card.pending { border-color: rgba(131,217,255,.38); }
-.device-card.pending .power, .device-card.pending .chip, .device-card.pending .temp-controls button { opacity: .55; }
+.device-card.pending .power { opacity: .92; }
+.device-card.pending .chip, .device-card.pending .temp-controls button { opacity: .55; }
 button:disabled { cursor: wait; opacity: .58; }
 .device-card::before {
   content: ""; position: absolute; inset: -20% -15% auto; height: 55%; z-index: -1; opacity: .58;
@@ -75,12 +76,17 @@ button:disabled { cursor: wait; opacity: .58; }
 .room-name { font-size: 1.35rem; font-weight: 760; letter-spacing: -.03em; margin-bottom: 4px; }
 .mode-caption { color: var(--muted); display: flex; gap: 7px; align-items: center; font-size: .88rem; }
 .mode-glyph { font-size: 1rem; width: 18px; text-align: center; }
+.sync-status { color: var(--accent); display: flex; gap: 6px; align-items: center; margin-top: 6px; font-size: .69rem; }
+.sync-spinner { width: 9px; height: 9px; border: 1.5px solid rgba(131,217,255,.3); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 .power {
   width: 50px; height: 50px; border-radius: 17px; border: 1px solid var(--line); color: var(--text);
   background: rgba(255,255,255,.055); display: grid; place-items: center; font-size: 1.3rem;
   transition: background .24s ease, transform .18s ease, box-shadow .24s ease;
 }
+.power-symbol { line-height: 1; }
 .power[aria-pressed="true"] { background: rgba(76,190,246,.2); box-shadow: 0 0 0 5px rgba(70,184,241,.08); }
+.device-card.pending .power[aria-pressed="true"] { box-shadow: 0 0 0 5px rgba(70,184,241,.13), 0 0 20px rgba(70,184,241,.14); }
 .power:active, .control-button:active, .primary:active { transform: scale(.96); }
 .temperature-block { min-height: 218px; display: grid; place-items: center; text-align: center; position: relative; }
 .target-temp { font-size: clamp(4.8rem, 16vw, 7rem); font-weight: 240; letter-spacing: -.085em; line-height: .86; font-variant-numeric: tabular-nums; transition: transform .28s cubic-bezier(.2,.8,.2,1), opacity .28s; }

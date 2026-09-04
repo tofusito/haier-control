@@ -30,6 +30,23 @@ State and command execution still use the cloud; a cached inventory is not offli
 acknowledges it after saving to localStorage. Routine status reads and container restarts
 cannot consume this delivery. Existing SQLite token hashes remain compatible.
 
+## UI consistency and latency
+
+The web client applies each control locally before waiting for hOn: power, temperature,
+mode, fan, swing, and advanced settings immediately update the card, icon, color, label,
+and accessibility state. The card remains visibly active while a small synchronization
+indicator and `aria-busy` state prevent duplicate taps. Requests are aborted after ten
+seconds; a rejection or timeout restores the last known state, surfaces a short retry
+message, and schedules a fresh read.
+
+The cloud driver reuses a context response for up to eight seconds, invalidates it after an
+accepted command, and does not perform a redundant second state request before returning.
+The UI keeps the accepted optimistic value for a short reconciliation window so an older
+SSE/REST response cannot immediately overwrite it. Once hOn reports the requested value,
+the remote state replaces the local snapshot silently; if it does not converge, the next
+fresh read wins. Timer create, edit, and cancel operations use the same local-first pattern
+and keep pending mutations ahead of stale SSE timer events.
+
 ## Drivers
 
 `app.drivers.base.Driver` is the internal compatibility boundary:
