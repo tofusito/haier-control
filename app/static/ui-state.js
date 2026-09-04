@@ -49,8 +49,14 @@
   }
 
   function mergeTimerMutations(remoteTimers, mutations) {
-    const merged = new Map(remoteTimers.map(timer => [timer.id, timer]));
-    mutations?.forEach(mutation => merged.set(mutation.optimistic.id, mutation.optimistic));
+    const merged = new Map((remoteTimers || []).map(timer => [timer.id, timer]));
+    const remoteByKey = new Map((remoteTimers || []).map(timer => [timer.idempotency_key, timer.id]));
+    mutations?.forEach(mutation => {
+      const optimistic = mutation.optimistic;
+      const remoteId = remoteByKey.get(optimistic.idempotency_key);
+      if (remoteId) merged.delete(remoteId);
+      merged.set(optimistic.id, optimistic);
+    });
     return [...merged.values()].sort((a, b) => new Date(a.execute_at) - new Date(b.execute_at));
   }
 
@@ -114,15 +120,14 @@
           toast(result?.message || "El cambio no fue aceptado");
           return { status: "rejected", result };
         }
-        if (result.state) {
-          device.state = result.state;
-          state.acceptedCommands.delete(deviceId);
-        } else {
-          state.acceptedCommands.set(deviceId, { operation, value, key, acceptedAt: now() });
-        }
+        if (result.state) device.state = result.state;
+        // Keep the acceptance marker even when the API includes a state. A
+        // following SSE/poll can still be older than that response, so it must
+        // not repaint the card until the short settle window has elapsed.
+        state.acceptedCommands.set(deviceId, { operation, value, key, acceptedAt: now() });
         state.optimisticSnapshots.delete(deviceId);
         state.pendingCommands.delete(deviceId);
-        render();
+        showError(""); render();
         toast("Cambio confirmado");
         queueRefresh(1200);
         return { status: "accepted", result };

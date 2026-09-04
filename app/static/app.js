@@ -87,7 +87,13 @@ function deviceCard(device) {
   const target = formatTemperature(device.state.target_temperature);
   const modeChips = caps.modes.map(item => `<button class="chip ${device.state.mode === item ? "active" : ""}" data-command="set_mode" data-value="${item}"${disabled}>${escapeHtml(labels[item] || item)}</button>`).join("");
   const fanChips = caps.fan_modes.map(item => `<button class="chip ${device.state.fan_mode === item ? "active" : ""}" data-command="set_fan" data-value="${item}"${disabled}>${escapeHtml(labels[item] || item)}</button>`).join("");
-  const timerHtml = timer ? `<span><strong>${timer.action === "on" ? "Encender" : "Apagar"} en <span data-countdown="${timer.execute_at}">${countdown(timer.execute_at)}</span></strong><small>${localTime(timer.execute_at)} · toca para editar</small></span><span class="timer-pulse"></span>` : `<span><strong>Temporizador</strong><small>Encender o apagar después</small></span><span>＋</span>`;
+  const timerPending = Boolean(timer && state.timerMutations.has(timer.id));
+  const timerButtonDisabled = timerPending ? " disabled" : "";
+  const timerHtml = timerPending
+    ? `<span><strong>Sincronizando temporizador…</strong><small>${localTime(timer.execute_at)}</small></span><span class="timer-pulse"></span>`
+    : timer
+      ? `<span><strong>${timer.action === "on" ? "Encender" : "Apagar"} en <span data-countdown="${timer.execute_at}">${countdown(timer.execute_at)}</span></strong><small>${localTime(timer.execute_at)} · toca para editar</small></span><span class="timer-pulse"></span>`
+      : `<span><strong>Temporizador</strong><small>Encender o apagar después</small></span><span>＋</span>`;
   return `<article class="device-card ${mode} ${device.id === state.selectedDeviceId ? "selected" : ""} ${pending ? "pending" : ""}" data-device="${device.id}" aria-busy="${pending}">
     <div class="card-content">
       <div class="card-head"><div><div class="room-name">${escapeHtml(device.name)}</div><div class="mode-caption"><span class="mode-glyph">${glyph}</span><span>${power.label} · ${modeLabel}${device.state.stale ? " · dato antiguo" : ""}</span></div>${pending ? `<div class="sync-status" role="status" aria-live="polite"><span class="sync-spinner" aria-hidden="true"></span>${power.status}</div>` : ""}</div>
@@ -96,7 +102,7 @@ function deviceCard(device) {
       ${caps.temperature_min != null ? `<div class="temp-controls"><button data-temp="down" aria-label="Bajar temperatura"${disabled}>−</button><button data-temp="up" aria-label="Subir temperatura"${disabled}>＋</button></div>` : ""}
       ${modeChips ? `<div class="control-section"><div class="control-label"><span>Modo</span><span>${modeLabel}</span></div><div class="chips">${modeChips}</div></div>` : ""}
       ${fanChips ? `<div class="control-section"><div class="control-label"><span>Ventilador</span><span>${escapeHtml(labels[device.state.fan_mode] || device.state.fan_mode || "—")}</span></div><div class="chips">${fanChips}</div></div>` : ""}
-      <div class="actions"><button class="control-button timer-summary" data-timer>${timerHtml}</button><button class="control-button" data-more aria-label="Más controles">•••</button></div>
+      <div class="actions"><button class="control-button timer-summary" data-timer${timerButtonDisabled}>${timerHtml}</button><button class="control-button" data-more aria-label="Más controles"${disabled}>•••</button></div>
     </div></article>`;
 }
 
@@ -168,10 +174,10 @@ async function saveTimer(event) {
   try {
     const saved = editId
       ? await apiWithTimeout(`/api/v1/timers/${editId}`, { method:"PATCH", body:JSON.stringify({ execute_at:executeAt.toISOString(), command }) })
-      : await apiWithTimeout("/api/v1/timers", { method:"POST", body:JSON.stringify({ device_id:deviceId, action, execute_at:executeAt.toISOString(), command }) });
+      : await apiWithTimeout("/api/v1/timers", { method:"POST", body:JSON.stringify({ device_id:deviceId, action, execute_at:executeAt.toISOString(), command, idempotency_key:localId }) });
     state.timerMutations.delete(localId);
     state.timers = state.timers.filter(item => item.id !== localId && item.id !== saved.id).concat(saved);
-    render(); toast(editId ? "Temporizador actualizado" : "Temporizador programado");
+    showError(""); render(); toast(editId ? "Temporizador actualizado" : "Temporizador programado");
   } catch (error) {
     state.timerMutations.delete(localId);
     state.timers = state.timers.filter(item => item.id !== localId);
@@ -239,8 +245,8 @@ function openMore(device) {
     if (item.kind === "toggle") rows.push(`<div class="advanced-row"><span>${escapeHtml(item.label)}</span><button class="switch" type="button" aria-pressed="${Boolean(device.state.advanced[item.key])}" data-advanced="${item.key}" aria-label="${escapeHtml(item.label)}"></button></div>`);
   });
   root.innerHTML = rows.join("") || `<p class="muted">Este modelo no anuncia controles avanzados.</p>`;
-  $$('[data-advanced]', root).forEach(button => button.addEventListener("click", async () => { await send(device.id, "set_advanced", button.getAttribute("aria-pressed") !== "true", button.dataset.advanced); $("#moreDialog").close(); }));
-  $$('[data-more-command]', root).forEach(select => select.addEventListener("change", async () => { await send(device.id, select.dataset.moreCommand, select.value); $("#moreDialog").close(); }));
+  $$('[data-advanced]', root).forEach(button => button.addEventListener("click", () => { $("#moreDialog").close(); void send(device.id, "set_advanced", button.getAttribute("aria-pressed") !== "true", button.dataset.advanced); }));
+  $$('[data-more-command]', root).forEach(select => select.addEventListener("change", () => { $("#moreDialog").close(); void send(device.id, select.dataset.moreCommand, select.value); }));
   $("#moreDialog").showModal();
 }
 function selectRow(label, command, options, selected) { return `<div class="advanced-row"><label>${label}<select data-more-command="${command}">${options.map(value => `<option value="${value}" ${value === selected ? "selected" : ""}>${escapeHtml(labels[value] || value.replace("position_","Posición "))}</option>`).join("")}</select></label></div>`; }

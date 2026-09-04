@@ -91,6 +91,15 @@ test("power is reflected immediately and consolidates after acceptance", async (
   assert.deepEqual(h.refreshes, [1200]);
 });
 
+test("a stale SSE response cannot overwrite an accepted response that included state", async () => {
+  const h = harness({ api: async () => ({ accepted: true, state: device({ power: true }).state }) });
+  await h.controller.send("salon", "power", true);
+
+  h.controller.reconcileDevices([device({ power: false })]);
+  assert.equal(h.state.devices[0].state.power, true);
+  assert.equal(h.state.acceptedCommands.has("salon"), true);
+});
+
 test("a rejected command rolls back and leaves a clear retry path", async () => {
   const h = harness({ api: async () => { throw new Error("Haier no aceptó el cambio"); } });
 
@@ -196,4 +205,15 @@ test("a stale timer event cannot overwrite an optimistic timer mutation", () => 
   const merged = mergeTimerMutations([stale], new Map([["timer-1", { optimistic }]]));
   assert.equal(merged.length, 1);
   assert.equal(merged[0].status, "cancelled");
+});
+
+test("a server timer with the same idempotency key does not duplicate the optimistic timer", () => {
+  const optimistic = {
+    id: "pending-1", device_id: "salon", action: "off", execute_at: "2026-09-05T02:00:00Z",
+    status: "scheduled", command: {}, idempotency_key: "pending-1", created_at: "2026-09-05T00:00:00Z",
+    updated_at: "2026-09-05T00:30:00Z", executed_at: null, error: null,
+  };
+  const remote = { ...optimistic, id: "server-1", updated_at: "2026-09-05T00:30:01Z" };
+  const merged = mergeTimerMutations([remote], new Map([[optimistic.id, { optimistic }]]));
+  assert.deepEqual(merged.map(timer => timer.id), ["pending-1"]);
 });
