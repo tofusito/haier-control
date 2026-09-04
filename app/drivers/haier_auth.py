@@ -14,9 +14,18 @@ AUTH_API = "https://account2.hon-smarthome.com"
 API_URL = "https://api-iot.he.services"
 REDIRECT_URI = "hon://mobilesdk/detect/oauth/done"
 OAUTH_SCOPE = "api openid refresh_token web"
+AUTH_USER_AGENT = "Chrome/999.999.999.999"
 
 
 class HaierAuthenticationError(RuntimeError):
+    pass
+
+
+class HaierPairingTokenError(HaierAuthenticationError):
+    pass
+
+
+class HaierProtocolError(HaierAuthenticationError):
     pass
 
 
@@ -189,7 +198,7 @@ class HaierAuthenticator:
         )
 
     async def login(self, email: str, password: str) -> HaierTokens:
-        headers = {"user-agent": "haier-control/0.1"}
+        headers = {"user-agent": AUTH_USER_AGENT}
         async with httpx.AsyncClient(
             timeout=self.timeout, follow_redirects=True, headers=headers
         ) as client:
@@ -216,7 +225,7 @@ class HaierAuthenticator:
 
             match = re.search(r'"fwuid":"(.*?)","loaded":(\{.*?\})', login_page.text)
             if not match:
-                raise HaierAuthenticationError("Salesforce login schema changed (fwuid missing)")
+                raise HaierProtocolError("Salesforce login schema changed (fwuid missing)")
             fwuid, loaded_raw = match.groups()
             loaded = json.loads(loaded_raw)
             page_uri = str(login_page.url).replace(AUTH_API, "")
@@ -300,7 +309,7 @@ class HaierAuthenticator:
                     "refresh_token": refresh_token,
                     "grant_type": "refresh_token",
                 },
-                headers={"user-agent": "haier-control/0.1"},
+                headers={"user-agent": AUTH_USER_AGENT},
             )
             response.raise_for_status()
             data = response.json()
@@ -334,7 +343,7 @@ class InteractiveHaierLogin:
         self.client = httpx.AsyncClient(
             timeout=timeout,
             follow_redirects=True,
-            headers={"user-agent": "haier-control/0.1"},
+            headers={"user-agent": AUTH_USER_AGENT},
         )
         self.context: MfaContext | None = None
         self.closed = False
@@ -360,7 +369,7 @@ class InteractiveHaierLogin:
         login_page.raise_for_status()
         match = re.search(r'"fwuid":"(.*?)","loaded":(\{.*?\})', login_page.text)
         if not match:
-            raise HaierAuthenticationError("Salesforce login schema changed (fwuid missing)")
+            raise HaierProtocolError("Salesforce login schema changed (fwuid missing)")
         fwuid, loaded_raw = match.groups()
         page_uri = str(login_page.url).replace(AUTH_API, "")
         start_url = unquote(page_uri.rsplit("startURL=", 1)[-1]).split("%3D")[0]

@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Annotated, Any, cast
 
+import httpx
 from fastapi import FastAPI, Header, HTTPException, Query, Request, status
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
@@ -14,6 +16,11 @@ from app.auth import require_scope
 from app.controller import Controller
 from app.database import Database
 from app.drivers.base import Driver, DriverError
+from app.drivers.haier_auth import (
+    HaierAuthenticationError,
+    HaierPairingTokenError,
+    HaierProtocolError,
+)
 from app.drivers.haier_cloud import HaierCloudDriver
 from app.drivers.mock import MockDriver
 from app.events import EventBus
@@ -40,6 +47,41 @@ from app.settings import Settings, load_secret
 from app.setup_flow import SetupFlowManager
 
 STATIC_DIR = Path(__file__).parent / "static"
+_LOGGER = logging.getLogger(__name__)
+
+
+def _setup_failure(exc: Exception) -> tuple[int, str, str]:
+    if isinstance(exc, HaierPairingTokenError):
+        return (
+            status.HTTP_400_BAD_REQUEST,
+            "El token de emparejamiento no es válido o ya se usó. Solicita uno nuevo.",
+            "pairing_token",
+        )
+    if isinstance(exc, HaierProtocolError):
+        return (
+            status.HTTP_502_BAD_GATEWAY,
+            "hOn cambió temporalmente su flujo de acceso. No se enviaron las credenciales; "
+            "actualiza Haier Control o inténtalo más tarde.",
+            "protocol",
+        )
+    if isinstance(exc, httpx.HTTPError):
+        return (
+            status.HTTP_502_BAD_GATEWAY,
+            "No se pudo contactar con hOn. Comprueba la conexión y vuelve a intentarlo.",
+            "network",
+        )
+    if isinstance(exc, HaierAuthenticationError):
+        return (
+            status.HTTP_400_BAD_REQUEST,
+            "hOn rechazó el acceso o devolvió una respuesta inesperada. Comprueba primero "
+            "las credenciales en la app oficial y vuelve a intentarlo con un token nuevo.",
+            "authentication",
+        )
+    return (
+        status.HTTP_500_INTERNAL_SERVER_ERROR,
+        "El acceso a hOn falló antes de completarse. Genera un token nuevo y vuelve a intentarlo.",
+        "unexpected",
+    )
 
 
 def create_app(
@@ -163,10 +205,13 @@ def create_app(
                 payload.pairing_token, payload.email, payload.password
             )
         except Exception as exc:
-            raise HTTPException(
-                status.HTTP_400_BAD_REQUEST,
-                "hOn authentication failed; check credentials, pairing token, or retry later",
-            ) from exc
+            error_status, detail, category = _setup_failure(exc)
+            _LOGGER.warning(
+                "Haier setup failed category=%s exception=%s",
+                category,
+                type(exc).__name__,
+            )
+            raise HTTPException(error_status, detail) from exc
 
     @app.post(
         "/api/v1/setup/haier/otp",

@@ -26,3 +26,7 @@ def configure_logging(level: str) -> None:
     root = logging.getLogger()
     root.handlers = [handler]
     root.setLevel(level.upper())
+    # httpx logs complete request URLs at INFO. Salesforce login URLs contain
+    # short-lived signed handoff values, so retain failures without logging URLs.
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+    logging.getLogger("httpcore").setLevel(logging.WARNING)

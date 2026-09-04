@@ -8,7 +8,12 @@ from collections.abc import Callable
 from dataclasses import dataclass
 
 from app.database import Database
-from app.drivers.haier_auth import HaierAuthenticationError, HaierTokens, InteractiveHaierLogin
+from app.drivers.haier_auth import (
+    HaierAuthenticationError,
+    HaierPairingTokenError,
+    HaierTokens,
+    InteractiveHaierLogin,
+)
 from app.drivers.haier_cloud import HaierCloudDriver
 from app.models import HaierSetupResponse
 from app.security import new_api_token, token_hash
@@ -79,7 +84,7 @@ class SetupFlowManager:
                     token_hash(pairing_token, self.master_key), self._pairing_digest
                 )
             ):
-                raise HaierAuthenticationError("Pairing token is invalid or expired")
+                raise HaierPairingTokenError("Pairing token is invalid or expired")
             self._pairing_digest = None
             self._pairing_expires_at = 0.0
         session = self._session_factory()
