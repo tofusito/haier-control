@@ -8,7 +8,7 @@ from datetime import timedelta
 from app.database import Database, utc_now
 from app.drivers.base import Driver
 from app.events import EventBus
-from app.models import CommandRequest, CommandResult, DeviceState, DeviceView
+from app.models import CommandRequest, CommandResult, DeviceState, DeviceSummary, DeviceView
 
 
 class Controller:
@@ -28,8 +28,7 @@ class Controller:
 
     async def list_devices(self) -> list[DeviceView]:
         devices = await self.driver.list_devices()
-        result: list[DeviceView] = []
-        for device in devices:
+        async def with_state(device: DeviceSummary) -> DeviceView:
             try:
                 state = await self.driver.get_state(device.id)
                 self._state_cache[device.id] = state
@@ -39,8 +38,9 @@ class Controller:
                     state = cached.model_copy(update={"stale": True, "error": type(exc).__name__})
                 else:
                     raise
-            result.append(DeviceView(**device.model_dump(), state=state))
-        return result
+            return DeviceView(**device.model_dump(), state=state)
+
+        return list(await asyncio.gather(*(with_state(device) for device in devices)))
 
     async def get_device(self, device_id: str) -> DeviceView:
         devices = await self.driver.list_devices()

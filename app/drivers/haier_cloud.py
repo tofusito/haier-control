@@ -135,6 +135,7 @@ class HaierCloudDriver:
         self._inventory_loaded = False
         self._inventory_lock = asyncio.Lock()
         self._auth_lock = asyncio.Lock()
+        self._context_cache: dict[str, tuple[float, dict[str, Any]]] = {}
         self._auth_retry_after = 0.0
         self.last_error: str | None = None
 
@@ -155,6 +156,7 @@ class HaierCloudDriver:
                     restored[device.public_id] = device
                 self._devices = restored
                 self._inventory_loaded = True
+                self._inventory_checked = time.monotonic()
         except (OSError, KeyError, TypeError, ValueError):
             _LOGGER.warning("Local appliance inventory unavailable; discovery will rebuild it")
         if not self._session_path.exists():
@@ -176,6 +178,7 @@ class HaierCloudDriver:
     def store_tokens(self, tokens: HaierTokens) -> None:
         self._persist_tokens(tokens)
         self._tokens = tokens
+        self._context_cache.clear()
         self.last_error = None
 
     def _persist_tokens(self, tokens: HaierTokens) -> None:
@@ -357,6 +360,11 @@ class HaierCloudDriver:
             await self._ensure_schema(device)
             found[public_id] = device
         self._devices = found
+        self._context_cache = {
+            device_id: value
+            for device_id, value in self._context_cache.items()
+            if device_id in found
+        }
         inventory = []
         for device in found.values():
             item = asdict(device)
@@ -447,8 +455,10 @@ class HaierCloudDriver:
         params = set_parameters.get("parameters")
         return params if isinstance(params, dict) else {}
 
-    async def get_state(self, device_id: str) -> DeviceState:
-        device = await self._device(device_id)
+    async def _context(self, device: CloudDevice, *, max_age: float = 8.0) -> dict[str, Any]:
+        cached = self._context_cache.get(device.public_id)
+        if cached and time.monotonic() - cached[0] < max_age:
+            return cached[1]
         data = await self._request(
             "GET",
             "/commands/v1/context",
@@ -461,6 +471,12 @@ class HaierCloudDriver:
         payload = data.get("payload")
         if not isinstance(payload, dict):
             raise DriverUnavailable("Haier state response schema changed")
+        self._context_cache[device.public_id] = (time.monotonic(), payload)
+        return payload
+
+    async def get_state(self, device_id: str) -> DeviceState:
+        device = await self._device(device_id)
+        payload = await self._context(device)
         shadow = payload.get("shadow", {})
         shadow_params = shadow.get("parameters", {}) if isinstance(shadow, dict) else {}
         if not isinstance(shadow_params, dict):
@@ -537,17 +553,9 @@ class HaierCloudDriver:
 
     async def send_command(self, device_id: str, command: CommandRequest) -> CommandResult:
         device = await self._device(device_id)
-        data = await self._request(
-            "GET",
-            "/commands/v1/context",
-            params={
-                "macAddress": device.mac,
-                "applianceType": device.appliance_type,
-                "category": "CYCLE",
-            },
-        )
+        payload = await self._context(device)
         try:
-            current = data["payload"]["shadow"]["parameters"]
+            current = payload["shadow"]["parameters"]
         except (KeyError, TypeError) as exc:
             raise DriverUnavailable("Current settings are unavailable") from exc
         if not isinstance(current, dict):
@@ -573,23 +581,20 @@ class HaierCloudDriver:
             "applianceType": device.appliance_type,
         }
         result = await self._request("POST", "/commands/v1/send", json=envelope)
-        payload = result.get("payload")
-        accepted = isinstance(payload, dict) and payload.get("resultCode") == "0"
+        send_payload = result.get("payload")
+        accepted = isinstance(send_payload, dict) and send_payload.get("resultCode") == "0"
         if not accepted:
             raise DriverUnavailable("Haier cloud did not confirm the command")
-        state: DeviceState | None
-        try:
-            state = await self.get_state(device_id)
-            message = "Cloud accepted the command; state reconciled by polling"
-        except DriverUnavailable:
-            state = None
-            message = "Cloud accepted the command; state confirmation is still pending"
+        # The send response is the authoritative acceptance signal. Invalidate the
+        # short context cache and let the next normal poll reconcile the appliance;
+        # waiting for a second cloud round trip would make every tap feel sluggish.
+        self._context_cache.pop(device_id, None)
         return CommandResult(
             accepted=True,
             device_id=device_id,
             operation=command.operation,
-            state=state,
-            message=message,
+            state=None,
+            message="Cloud accepted the command; state confirmation is pending",
         )
 
     def _raw_command(self, device: CloudDevice, command: CommandRequest) -> tuple[str, str]:

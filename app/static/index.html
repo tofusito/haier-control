@@ -22,6 +22,7 @@
 
     <main>
       <section id="errorBanner" class="banner hidden" role="alert"></section>
+      <nav id="deviceSwitcher" class="device-switcher" aria-label="Seleccionar aire acondicionado"></nav>
       <section id="devices" class="device-grid" aria-live="polite">
         <article class="skeleton-card"></article>
         <article class="skeleton-card"></article>
@@ -142,7 +143,10 @@
           </div>
         </div>
         <p id="timerError" class="field-error" role="alert"></p>
-        <button class="primary wide" type="submit">Guardar temporizador</button>
+        <div class="form-actions">
+          <button id="deleteTimerButton" class="danger-button wide hidden" type="button">Eliminar temporizador</button>
+          <button class="primary wide" type="submit">Guardar temporizador</button>
+        </div>
       </form>
     </dialog>
 

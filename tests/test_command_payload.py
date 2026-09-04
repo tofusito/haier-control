@@ -55,7 +55,7 @@ async def test_power_payload_includes_nested_parameters_and_preserves_settings(
     driver._devices = {"ac": device()}
     current = {"onOffStatus": "0", "machMode": "1", "tempSel": "27"}
     context = {"payload": {"shadow": {"parameters": current}}}
-    driver._request = AsyncMock(side_effect=[context, {"payload": {"resultCode": "0"}}, context])
+    driver._request = AsyncMock(side_effect=[context, {"payload": {"resultCode": "0"}}])
     try:
         result = await driver.send_command("ac", CommandRequest(operation="power", value=power))
         assert result.accepted
@@ -99,5 +99,27 @@ async def test_missing_current_settings_prevents_dispatch(tmp_path: Path) -> Non
             await driver.send_command("ac", CommandRequest(operation="power", value=True))
         driver._request.assert_awaited_once()
         assert driver._request.call_args.args[0] == "GET"
+    finally:
+        await driver.close()
+
+
+@pytest.mark.asyncio
+async def test_fresh_context_is_reused_for_the_next_command(tmp_path: Path) -> None:
+    driver = HaierCloudDriver(b"k" * 40, tmp_path / "session.enc", "client")
+    driver._tokens = HaierTokens("a", "r", "i", "c", "mobile")
+    driver._devices = {"ac": device()}
+    context = {
+        "payload": {
+            "shadow": {"parameters": {"onOffStatus": "0", "machMode": "1", "tempSel": "27"}}
+        }
+    }
+    driver._request = AsyncMock(side_effect=[context, {"payload": {"resultCode": "0"}}])
+    try:
+        await driver.get_state("ac")
+        result = await driver.send_command("ac", CommandRequest(operation="power", value=True))
+        assert result.accepted
+        assert driver._request.await_count == 2
+        assert driver._request.call_args_list[0].args == ("GET", "/commands/v1/context")
+        assert driver._request.call_args_list[1].args == ("POST", "/commands/v1/send")
     finally:
         await driver.close()

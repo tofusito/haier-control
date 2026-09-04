@@ -1,4 +1,10 @@
-const state = { token: sessionStorage.getItem("haierToken") || localStorage.getItem("haierToken") || "", devices: [], timers: [], eventAbort: null, setupFlow: null };
+const state = {
+  token: sessionStorage.getItem("haierToken") || localStorage.getItem("haierToken") || "",
+  devices: [], timers: [], eventAbort: null, setupFlow: null,
+  selectedDeviceId: localStorage.getItem("haierSelectedDevice") || "",
+  pendingCommands: new Set(), optimisticSnapshots: new Map(), refreshPromise: null,
+  refreshTimer: null,
+};
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const modeMeta = {
@@ -33,8 +39,37 @@ function countdown(value) {
 function nextTimer(deviceId) { return state.timers.filter(t => t.device_id === deviceId && t.status === "scheduled").sort((a,b) => new Date(a.execute_at)-new Date(b.execute_at))[0]; }
 function cardMode(device) { return device.state.power ? (device.state.mode || "auto") : "off"; }
 
+function formatTemperature(value, fallback = "—") {
+  return value == null ? fallback : Number(value).toFixed(1).replace(".0", "");
+}
+
+function renderSwitcher() {
+  const root = $("#deviceSwitcher");
+  if (!state.devices.length) { root.innerHTML = ""; return; }
+  if (!state.devices.some(device => device.id === state.selectedDeviceId)) {
+    state.selectedDeviceId = state.devices[0].id;
+  }
+  root.innerHTML = `<div class="device-switcher-track">${state.devices.map(device => {
+    const selected = device.id === state.selectedDeviceId;
+    const mode = cardMode(device); const [modeLabel, glyph] = modeMeta[mode] || [mode, "·"];
+    const power = device.state.power ? "Encendido" : "Apagado";
+    return `<button class="device-tab ${selected ? "active" : ""}" type="button" data-device-select="${device.id}" aria-pressed="${selected}">
+      <span class="device-tab-head"><span>${escapeHtml(device.name)}</span><span class="device-tab-glyph">${glyph}</span></span>
+      <span class="device-tab-meta"><span>${power} · ${escapeHtml(modeLabel)}</span><strong>${formatTemperature(device.state.target_temperature)}°</strong></span>
+      <small>${device.state.room_temperature == null ? "Ambiente —" : `Ambiente ${formatTemperature(device.state.room_temperature)}°`}</small>
+    </button>`;
+  }).join("")}</div>`;
+  $$('[data-device-select]', root).forEach(button => button.addEventListener("click", () => {
+    state.selectedDeviceId = button.dataset.deviceSelect;
+    localStorage.setItem("haierSelectedDevice", state.selectedDeviceId);
+    render();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }));
+}
+
 function render() {
   const root = $("#devices");
+  renderSwitcher();
   if (!state.devices.length) { root.innerHTML = `<div class="banner">No hay aires anunciados por el adaptador actual.</div>`; return; }
   root.innerHTML = state.devices.map(deviceCard).join("");
   bindCards();
@@ -43,17 +78,19 @@ function render() {
 function deviceCard(device) {
   const mode = cardMode(device); const [modeLabel, glyph] = modeMeta[mode] || [mode, "·"];
   const caps = device.capabilities; const timer = nextTimer(device.id);
-  const roomTemp = device.state.room_temperature == null ? "Sin dato de ambiente" : `Habitación ${Number(device.state.room_temperature).toFixed(1).replace(".0","")}°`;
-  const target = device.state.target_temperature == null ? "—" : Number(device.state.target_temperature).toFixed(1).replace(".0","");
-  const modeChips = caps.modes.map(item => `<button class="chip ${device.state.mode === item ? "active" : ""}" data-command="set_mode" data-value="${item}">${escapeHtml(labels[item] || item)}</button>`).join("");
-  const fanChips = caps.fan_modes.map(item => `<button class="chip ${device.state.fan_mode === item ? "active" : ""}" data-command="set_fan" data-value="${item}">${escapeHtml(labels[item] || item)}</button>`).join("");
+  const pending = state.pendingCommands.has(device.id);
+  const disabled = pending ? " disabled" : "";
+  const roomTemp = device.state.room_temperature == null ? "Sin dato de ambiente" : `Habitación ${formatTemperature(device.state.room_temperature)}°`;
+  const target = formatTemperature(device.state.target_temperature);
+  const modeChips = caps.modes.map(item => `<button class="chip ${device.state.mode === item ? "active" : ""}" data-command="set_mode" data-value="${item}"${disabled}>${escapeHtml(labels[item] || item)}</button>`).join("");
+  const fanChips = caps.fan_modes.map(item => `<button class="chip ${device.state.fan_mode === item ? "active" : ""}" data-command="set_fan" data-value="${item}"${disabled}>${escapeHtml(labels[item] || item)}</button>`).join("");
   const timerHtml = timer ? `<span><strong>${timer.action === "on" ? "Encender" : "Apagar"} en <span data-countdown="${timer.execute_at}">${countdown(timer.execute_at)}</span></strong><small>${localTime(timer.execute_at)} · toca para editar</small></span><span class="timer-pulse"></span>` : `<span><strong>Temporizador</strong><small>Encender o apagar después</small></span><span>＋</span>`;
-  return `<article class="device-card ${mode}" data-device="${device.id}">
+  return `<article class="device-card ${mode} ${device.id === state.selectedDeviceId ? "selected" : ""} ${pending ? "pending" : ""}" data-device="${device.id}" aria-busy="${pending}">
     <div class="card-content">
-      <div class="card-head"><div><div class="room-name">${escapeHtml(device.name)}</div><div class="mode-caption"><span class="mode-glyph">${glyph}</span><span>${modeLabel}${device.state.stale ? " · dato antiguo" : ""}</span></div></div>
-      <button class="power" type="button" data-power aria-pressed="${Boolean(device.state.power)}" aria-label="${device.state.power ? "Apagar" : "Encender"} ${escapeHtml(device.name)}">⌁</button></div>
+      <div class="card-head"><div><div class="room-name">${escapeHtml(device.name)}</div><div class="mode-caption"><span class="mode-glyph">${glyph}</span><span>${pending ? "Actualizando…" : `${modeLabel}${device.state.stale ? " · dato antiguo" : ""}`}</span></div></div>
+      <button class="power" type="button" data-power aria-pressed="${Boolean(device.state.power)}" aria-label="${device.state.power ? "Apagar" : "Encender"} ${escapeHtml(device.name)}"${disabled}>⌁</button></div>
       <div class="temperature-block"><div><div class="target-temp">${target}<sup>°</sup></div><div class="room-temp">${roomTemp}</div></div></div>
-      ${caps.temperature_min != null ? `<div class="temp-controls"><button data-temp="down" aria-label="Bajar temperatura">−</button><button data-temp="up" aria-label="Subir temperatura">＋</button></div>` : ""}
+      ${caps.temperature_min != null ? `<div class="temp-controls"><button data-temp="down" aria-label="Bajar temperatura"${disabled}>−</button><button data-temp="up" aria-label="Subir temperatura"${disabled}>＋</button></div>` : ""}
       ${modeChips ? `<div class="control-section"><div class="control-label"><span>Modo</span><span>${modeLabel}</span></div><div class="chips">${modeChips}</div></div>` : ""}
       ${fanChips ? `<div class="control-section"><div class="control-label"><span>Ventilador</span><span>${escapeHtml(labels[device.state.fan_mode] || device.state.fan_mode || "—")}</span></div><div class="chips">${fanChips}</div></div>` : ""}
       <div class="actions"><button class="control-button timer-summary" data-timer>${timerHtml}</button><button class="control-button" data-more aria-label="Más controles">•••</button></div>
@@ -63,6 +100,7 @@ function deviceCard(device) {
 function bindCards() {
   $$(".device-card").forEach(card => {
     const device = state.devices.find(item => item.id === card.dataset.device);
+    if (!device) return;
     $("[data-power]", card)?.addEventListener("click", () => send(device.id, "power", !device.state.power));
     $$('[data-command]', card).forEach(button => button.addEventListener("click", () => send(device.id, button.dataset.command, button.dataset.value)));
     $$('[data-temp]', card).forEach(button => button.addEventListener("click", () => {
@@ -76,17 +114,52 @@ function bindCards() {
   });
 }
 
+function applyOptimistic(device, operation, value, key) {
+  if (!state.optimisticSnapshots.has(device.id)) {
+    state.optimisticSnapshots.set(device.id, JSON.parse(JSON.stringify(device.state)));
+  }
+  switch (operation) {
+    case "power": device.state.power = Boolean(value); break;
+    case "set_mode": device.state.mode = value; break;
+    case "set_temperature": device.state.target_temperature = Number(value); break;
+    case "set_fan": device.state.fan_mode = value; break;
+    case "set_vertical_swing": device.state.vertical_swing = value; break;
+    case "set_horizontal_swing": device.state.horizontal_swing = value; break;
+    case "set_advanced": device.state.advanced = { ...device.state.advanced, [key]: Boolean(value) }; break;
+  }
+  device.state.updated_at = new Date().toISOString();
+  device.state.stale = false;
+  state.pendingCommands.add(device.id);
+  render();
+}
+
+function restoreOptimistic(device) {
+  const snapshot = state.optimisticSnapshots.get(device.id);
+  if (snapshot) device.state = snapshot;
+  state.optimisticSnapshots.delete(device.id);
+  state.pendingCommands.delete(device.id);
+  render();
+}
+
 async function send(deviceId, operation, value, key = null) {
+  const device = state.devices.find(item => item.id === deviceId);
+  if (!device || state.pendingCommands.has(deviceId)) return;
+  applyOptimistic(device, operation, value, key);
   try {
     const result = await api(`/api/v1/devices/${deviceId}/commands`, { method:"POST", body:JSON.stringify({ operation, value, key }) });
-    if (!result.accepted) { toast(result.message); return; }
-    await refresh(); toast("Cambio confirmado");
-  } catch (error) { showError(error.message); }
+    if (!result.accepted) { restoreOptimistic(device); toast(result.message); return; }
+    if (result.state) device.state = result.state;
+    state.optimisticSnapshots.delete(deviceId); state.pendingCommands.delete(deviceId); render();
+    toast("Cambio confirmado");
+    queueRefresh(1200);
+  } catch (error) { restoreOptimistic(device); showError(error.message); }
 }
 
 function openTimer(device) {
   const dialog = $("#timerDialog"), timer = nextTimer(device.id);
   $("#timerDeviceId").value = device.id; $("#timerEditId").value = timer?.id || "";
+  $("#timerError").textContent = "";
+  $("#deleteTimerButton").classList.toggle("hidden", !timer);
   $("#timerTitle").textContent = timer ? `Editar · ${device.name}` : `Programar · ${device.name}`;
   if (timer) {
     $(`input[name=timerAction][value=${timer.action}]`).checked = true;
@@ -116,10 +189,24 @@ async function saveTimer(event) {
   if (Number.isNaN(executeAt.getTime()) || executeAt <= new Date()) { $("#timerError").textContent = "Elige una hora futura."; return; }
   const command = action === "on" ? { mode:$("#timerMode").value, temperature:Number($("#timerTemperature").value), ...($("#timerFan").value ? {fan_mode:$("#timerFan").value} : {}) } : {};
   try {
-    if (editId) await api(`/api/v1/timers/${editId}`, { method:"PATCH", body:JSON.stringify({ execute_at:executeAt.toISOString(), command }) });
-    else await api("/api/v1/timers", { method:"POST", body:JSON.stringify({ device_id:deviceId, action, execute_at:executeAt.toISOString(), command }) });
-    $("#timerDialog").close(); await refresh(); toast(editId ? "Temporizador actualizado" : "Temporizador programado");
+    const saved = editId
+      ? await api(`/api/v1/timers/${editId}`, { method:"PATCH", body:JSON.stringify({ execute_at:executeAt.toISOString(), command }) })
+      : await api("/api/v1/timers", { method:"POST", body:JSON.stringify({ device_id:deviceId, action, execute_at:executeAt.toISOString(), command }) });
+    state.timers = state.timers.filter(item => item.id !== saved.id).concat(saved);
+    $("#timerDialog").close(); render(); toast(editId ? "Temporizador actualizado" : "Temporizador programado");
   } catch (error) { $("#timerError").textContent = error.message; }
+}
+
+async function deleteTimer() {
+  const timerId = $("#timerEditId").value;
+  if (!timerId || !window.confirm("¿Eliminar este temporizador?")) return;
+  const button = $("#deleteTimerButton"); button.disabled = true;
+  try {
+    const deleted = await api(`/api/v1/timers/${timerId}`, { method:"DELETE" });
+    state.timers = state.timers.filter(item => item.id !== deleted.id).concat(deleted);
+    $("#timerDialog").close(); render(); toast("Temporizador eliminado");
+  } catch (error) { $("#timerError").textContent = error.message; }
+  finally { button.disabled = false; }
 }
 
 function openMore(device) {
@@ -181,10 +268,22 @@ async function resendOtp() {
 
 async function refresh() {
   if (!state.token) { openTokenDialog(); return; }
-  try {
-    const [devices, timers] = await Promise.all([api("/api/v1/devices"), api("/api/v1/timers?include_finished=true")]);
-    state.devices = devices; state.timers = timers; showError(""); render(); setConnection(true, "En línea");
-  } catch (error) { if (error.message !== "unauthorized") { showError(error.message); setConnection(false, "Degradado"); } }
+  if (state.refreshPromise) return state.refreshPromise;
+  state.refreshPromise = (async () => {
+    try {
+      const [devices, timers] = await Promise.all([api("/api/v1/devices"), api("/api/v1/timers?include_finished=true")]);
+      const previous = new Map(state.devices.map(device => [device.id, device]));
+      state.devices = devices.map(device => state.pendingCommands.has(device.id) ? (previous.get(device.id) || device) : device);
+      state.timers = timers; showError(""); render(); setConnection(true, "En línea");
+    } catch (error) { if (error.message !== "unauthorized") { showError(error.message); setConnection(false, "Degradado"); } }
+    finally { state.refreshPromise = null; }
+  })();
+  return state.refreshPromise;
+}
+
+function queueRefresh(delay = 120) {
+  clearTimeout(state.refreshTimer);
+  state.refreshTimer = setTimeout(() => { state.refreshTimer = null; refresh(); }, delay);
 }
 function setConnection(ok, label) { const button=$("#connectionButton"); button.classList.toggle("online",ok); button.classList.toggle("error",!ok); $("#connectionLabel").textContent=label; }
 
@@ -194,11 +293,11 @@ async function connectEvents() {
     const response = await fetch("/api/v1/events", { headers:{Authorization:`Bearer ${state.token}`}, signal:controller.signal });
     if (!response.ok || !response.body) return;
     const reader=response.body.getReader(), decoder=new TextDecoder(); let buffer="";
-    while (true) { const {done,value}=await reader.read(); if(done) break; buffer+=decoder.decode(value,{stream:true}); const blocks=buffer.split("\n\n"); buffer=blocks.pop(); if(blocks.some(block=>block.startsWith("event: device")||block.startsWith("event: timer"))) await refresh(); }
+    while (true) { const {done,value}=await reader.read(); if(done) break; buffer+=decoder.decode(value,{stream:true}); const blocks=buffer.split("\n\n"); buffer=blocks.pop(); if(blocks.some(block=>block.startsWith("event: device")||block.startsWith("event: timer"))) queueRefresh(); }
   } catch (error) { if (error.name !== "AbortError") setTimeout(connectEvents, 5000); }
 }
 
-$("#tokenForm").addEventListener("submit", saveToken); $("#timerForm").addEventListener("submit", saveTimer); $("#haierSetupForm").addEventListener("submit", saveHaierSetup); $("#resendOtp").addEventListener("click", resendOtp);
+$("#tokenForm").addEventListener("submit", saveToken); $("#timerForm").addEventListener("submit", saveTimer); $("#deleteTimerButton").addEventListener("click", deleteTimer); $("#haierSetupForm").addEventListener("submit", saveHaierSetup); $("#resendOtp").addEventListener("click", resendOtp);
 $$('input[name=timerKind], input[name=timerAction]').forEach(input => input.addEventListener("change", syncTimerFields));
 $$('[data-minutes]').forEach(button => button.addEventListener("click", () => $("#timerMinutes").value = button.dataset.minutes));
 $$('[data-close]').forEach(button => button.addEventListener("click", () => button.closest("dialog").close()));
