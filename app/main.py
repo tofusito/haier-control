@@ -131,9 +131,7 @@ def create_app(
         else:
             selected_driver = MockDriver()
         events = EventBus()
-        controller = Controller(
-            selected_driver, database, events, config.command_dedupe_seconds
-        )
+        controller = Controller(selected_driver, database, events, config.command_dedupe_seconds)
         scheduler = TimerScheduler(database, controller, events)
         setup_manager = SetupFlowManager(
             selected_driver if isinstance(selected_driver, HaierCloudDriver) else None,
@@ -152,13 +150,17 @@ def create_app(
         app.state.rate_limiter = RateLimiter()
         app.state.setup_manager = setup_manager
         await selected_driver.start()
-        if isinstance(selected_driver, HaierCloudDriver) and selected_driver.requires_reauth:
+        if isinstance(selected_driver, HaierCloudDriver):
             automatic = None
+            saved = None
             try:
                 automatic = load_automatic_credentials(config)
                 if automatic:
-                    _LOGGER.info("Starting one automatic hOn login source=%s", automatic.source)
-                    await setup_manager.begin_automatic(automatic.email, automatic.password)
+                    selected_driver.configure_credentials(automatic.email, automatic.password)
+                if selected_driver.requires_reauth:
+                    saved = selected_driver.saved_credentials()
+                    if saved:
+                        await setup_manager.begin_automatic(saved["email"], saved["password"])
             except AutomaticCredentialError as exc:
                 detail = (
                     "La autenticación automática está mal configurada. Corrige ambos "
@@ -173,15 +175,16 @@ def create_app(
                 _error_status, detail, category = _setup_failure(exc)
                 setup_manager.set_automatic_failure(detail)
                 _LOGGER.warning(
-                    "Automatic hOn setup failed category=%s exception=%s detail=%s",
+                    "Automatic hOn setup failed category=%s exception=%s",
                     category,
                     type(exc).__name__,
-                    str(exc),
                 )
             finally:
                 if automatic:
                     automatic.email = ""
                     automatic.password = ""
+                if saved:
+                    saved.clear()
                 clear_direct_credentials(config)
         setup_manager.ensure_pairing()
         await scheduler.start()
@@ -239,17 +242,13 @@ def create_app(
         response_model=HaierSetupResponse,
         tags=["setup"],
     )
-    async def start_haier_setup(
-        request: Request, payload: HaierSetupStart
-    ) -> HaierSetupResponse:
+    async def start_haier_setup(request: Request, payload: HaierSetupStart) -> HaierSetupResponse:
         client = request.client.host if request.client else "unknown"
         if not await request.app.state.rate_limiter.allow(f"haier-setup:{client}", 5, 600):
             raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, "Setup rate limit exceeded")
         try:
             manager = cast(SetupFlowManager, request.app.state.setup_manager)
-            return await manager.begin(
-                payload.pairing_token, payload.email, payload.password
-            )
+            return await manager.begin(payload.pairing_token, payload.email, payload.password)
         except Exception as exc:
             error_status, detail, category = _setup_failure(exc)
             _LOGGER.warning(
@@ -269,22 +268,26 @@ def create_app(
         manager = cast(SetupFlowManager, request.app.state.setup_manager)
         return manager.automatic_status()
 
+    @app.post("/api/v1/setup/haier/ack", tags=["setup"])
+    async def acknowledge_browser(
+        request: Request, identity: Any = require_scope("read", limit=60)
+    ) -> dict[str, bool]:
+        manager = cast(SetupFlowManager, request.app.state.setup_manager)
+        manager.acknowledge_browser(identity.digest)
+        return {"acknowledged": True}
+
     @app.post(
         "/api/v1/setup/haier/otp",
         response_model=HaierSetupResponse,
         tags=["setup"],
     )
-    async def submit_haier_otp(
-        request: Request, payload: HaierSetupOtp
-    ) -> HaierSetupResponse:
+    async def submit_haier_otp(request: Request, payload: HaierSetupOtp) -> HaierSetupResponse:
         client = request.client.host if request.client else "unknown"
         if not await request.app.state.rate_limiter.allow(f"haier-otp:{client}", 8, 600):
             raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, "OTP rate limit exceeded")
         try:
             manager = cast(SetupFlowManager, request.app.state.setup_manager)
-            return await manager.submit_otp(
-                payload.flow_id, payload.csrf_token, payload.code
-            )
+            return await manager.submit_otp(payload.flow_id, payload.csrf_token, payload.code)
         except Exception as exc:
             raise HTTPException(
                 status.HTTP_400_BAD_REQUEST,
@@ -328,9 +331,7 @@ def create_app(
         await database.create_token(
             payload.name, token_hash(token, request.app.state.master_key), set(payload.scopes)
         )
-        return TokenBootstrapResponse(
-            token=token, name=payload.name, scopes=sorted(payload.scopes)
-        )
+        return TokenBootstrapResponse(token=token, name=payload.name, scopes=sorted(payload.scopes))
 
     @app.get("/api/v1/openapi.json", tags=["system"])
     async def openapi_document(_identity: Any = require_scope("read", limit=60)) -> dict[str, Any]:

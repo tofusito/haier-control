@@ -13,6 +13,8 @@ async def test_health_is_only_public_operational_route(client: httpx.AsyncClient
     assert health.status_code == 200
     assert health.json()["status"] == "ok"
     assert devices.status_code == 401
+    ack = await client.post("/api/v1/setup/haier/ack")
+    assert ack.status_code == 401
 
 
 @pytest.mark.asyncio

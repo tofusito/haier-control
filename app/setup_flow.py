@@ -6,6 +6,7 @@ import secrets
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
+from pathlib import Path
 
 from app.database import Database
 from app.drivers.haier_auth import (
@@ -16,7 +17,7 @@ from app.drivers.haier_auth import (
 )
 from app.drivers.haier_cloud import HaierCloudDriver
 from app.models import HaierSetupResponse, HaierSetupStatusResponse
-from app.security import new_api_token, token_hash
+from app.security import SecretBox, new_api_token, token_hash, write_private
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -58,6 +59,14 @@ class SetupFlowManager:
         self._automatic_flow_id: str | None = None
         self._automatic_failure: str | None = None
         self._pending_api_token: str | None = None
+        self._delivery_path: Path = database.path.with_name("browser-setup.enc")
+        self._box = SecretBox(master_key)
+        if self._delivery_path.exists():
+            try:
+                saved = self._box.decrypt_json(self._delivery_path.read_bytes())
+                self._pending_api_token = str(saved["token"])
+            except (OSError, ValueError, KeyError):
+                _LOGGER.warning("Pending browser setup cannot be restored")
 
     @property
     def setup_required(self) -> bool:
@@ -157,13 +166,19 @@ class SetupFlowManager:
             )
         if not self.setup_required:
             token = self._pending_api_token
-            self._pending_api_token = None
             return HaierSetupStatusResponse(
                 status="complete",
                 api_token=token,
                 message="La sesión hOn está disponible.",
             )
         return HaierSetupStatusResponse(status="manual")
+
+    def acknowledge_browser(self, digest: str) -> None:
+        if self._pending_api_token and secrets.compare_digest(
+            token_hash(self._pending_api_token, self.master_key), digest
+        ):
+            self._delivery_path.unlink(missing_ok=True)
+            self._pending_api_token = None
 
     async def submit_otp(self, flow_id: str, csrf_token: str, code: str) -> HaierSetupResponse:
         flow = await self._flow(flow_id, csrf_token)
@@ -204,6 +219,8 @@ class SetupFlowManager:
                 token_hash(api_token, self.master_key),
                 {"read", "control", "timers"},
             )
+            write_private(self._delivery_path, self._box.encrypt_json({"token": api_token}))
+            self._pending_api_token = api_token
         return HaierSetupResponse(
             status="complete",
             api_token=api_token,

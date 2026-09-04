@@ -14,13 +14,21 @@ The encrypted hOn session is also stored in `/data/haier-session.enc`. The encry
 is supplied independently at `/run/secrets/haier_control_master_key`; it must never live in
 the volume or Git.
 
-The hOn password is never written to `/data`. Access, ID, Cognito, and refresh tokens are
-encrypted. On startup a reusable encrypted session takes precedence; otherwise an
-optional pair of private files wins over optional direct environment credentials. Each
-automatic source is attempted once and references are cleared afterward. Failure falls
-back to **Reconectar con hOn**; an MFA challenge pauses in memory and the UI requests only
-the OTP. Existing timers remain in SQLite and are not executed while control is
-unavailable; failure is visible.
+Access, ID, Cognito, and refresh tokens are encrypted and reused across restarts. Automatic
+credentials (private files first, environment second) update `haier-credentials.enc` at
+startup. Without either input, the saved encrypted credentials remain available for
+recovery. Successful refresh rotations are persisted atomically; concurrent renewals share
+a lock. A rejected refresh falls back to full login; failures back off for five minutes.
+Network outages never trigger a password login. MFA may require manual verification.
+
+`haier-devices.enc` holds stable local IDs, vendor identifiers, names, models, capabilities
+and command schemas. Discovery reconciles hourly and after restart, preserving the last
+inventory if the cloud is unavailable. An authoritative empty result removes old devices.
+State and command execution still use the cloud; a cached inventory is not offline control.
+
+`browser-setup.enc` preserves the first local API token until an authenticated browser
+acknowledges it after saving to localStorage. Routine status reads and container restarts
+cannot consume this delivery. Existing SQLite token hashes remain compatible.
 
 ## Drivers
 

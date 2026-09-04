@@ -166,7 +166,7 @@ async function saveHaierSetup(event) {
     }
     if (result.status === "complete") {
       state.setupFlow = null;
-      if (result.api_token) { state.token = result.api_token; sessionStorage.setItem("haierToken", result.api_token); }
+      if (result.api_token) { await rememberSetupToken(result.api_token); }
       $("#haierSetupDialog").close(); toast("hOn conectado");
       if (state.token) { await refresh(); connectEvents(); } else openTokenDialog("Conexión hOn completada; introduce tu token local.");
     }
@@ -208,7 +208,7 @@ async function boot() {
   try {
     const setup = await fetch("/api/v1/setup/haier/status", { cache:"no-store" }).then(response => response.json());
     if (setup.status === "complete" && setup.api_token) {
-      state.token = setup.api_token; sessionStorage.setItem("haierToken", setup.api_token);
+      await rememberSetupToken(setup.api_token);
     }
     if (setup.status === "mfa_required") {
       state.setupFlow = { id:setup.flow_id, csrf:setup.csrf_token };
@@ -224,5 +224,11 @@ async function boot() {
     }
   } catch (_) { setConnection(false, "Sin conexión"); }
   if (state.token) { refresh(); connectEvents(); } else openTokenDialog();
+}
+async function rememberSetupToken(token) {
+  localStorage.setItem("haierToken", token);
+  sessionStorage.removeItem("haierToken");
+  state.token = token;
+  await api("/api/v1/setup/haier/ack", { method:"POST" });
 }
 boot();

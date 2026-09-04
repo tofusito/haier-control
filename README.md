@@ -17,7 +17,7 @@ on/off timers without depending on Home Assistant at runtime.
   Turn-on timers may include mode, target temperature, fan, swing, and advanced options.
 - Stable versioned API for devices, commands, timers, SSE updates, and authenticated
   OpenAPI at `/api/v1/openapi.json`.
-- API tokens are random and stored only as keyed hashes, with `read`, `control`, and
+- API tokens are random and authenticated by keyed hashes, with `read`, `control`, and
   `timers` scopes. Commands are rate-limited, deduplicated, and audited.
 - `MockDriver` is fully functional. `HaierCloudDriver` is opt-in and uses REST polling;
   MQTT realtime is a documented future enhancement.
@@ -73,11 +73,16 @@ docker compose exec haier-control haier-control auth
 
 ### Optional automatic hOn login
 
-Automatic login runs once at startup only when no encrypted hOn session can be reused.
-Precedence is: encrypted session, private files, direct environment variables, then the
-interactive UI. A successful login persists only encrypted session tokens. A failure
-falls back to manual pairing without retrying in a loop; an email MFA challenge opens the
-UI directly at the OTP step.
+Configure the credentials once and keep `/data` plus the separate master key across
+deployments. Haier Control reuses encrypted session tokens, saves refreshed tokens, and
+recovers a rejected refresh using its encrypted credential copy. File inputs take precedence
+over environment inputs and update that copy at startup. Network failures do not trigger
+password login; failed recovery backs off for five minutes. MFA may still require a code.
+
+AC identifiers, models and capabilities are encrypted locally and reconciled hourly.
+The first browser token is remembered automatically in localStorage and is only marked
+delivered after browser acknowledgment. Existing local tokens remain valid on upgrade.
+The cloud is still required for live state and control.
 
 Recommended file mode:
 
@@ -91,8 +96,8 @@ volumes:
 ```
 
 Both host files must be regular files with mode `0600`. Keep them outside Git and `/data`.
-The process reads them once, removes its in-memory references after the attempt, and never
-logs their contents.
+The process imports them into its encrypted recovery file, clears temporary references,
+and never logs their contents. Back up `/data` and the master key separately.
 
 For a hobby installation that accepts a weaker host-side boundary, set both
 `HAIER_HON_EMAIL` and `HAIER_HON_PASSWORD`. Docker inspect, DockerHand, Compose output, and

@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import hmac
 import json
 import logging
-from dataclasses import dataclass, field
+import time
+from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -12,7 +14,13 @@ from typing import Any
 import httpx
 
 from app.drivers.base import DriverUnavailable, UnsupportedCapability
-from app.drivers.haier_auth import API_URL, HaierAuthenticator, HaierTokens, device_payload
+from app.drivers.haier_auth import (
+    API_URL,
+    HaierAuthenticationError,
+    HaierAuthenticator,
+    HaierTokens,
+    device_payload,
+)
 from app.models import (
     AdvancedCapability,
     CommandRequest,
@@ -22,7 +30,7 @@ from app.models import (
     DeviceState,
     DeviceSummary,
 )
-from app.security import SecretBox
+from app.security import SecretBox, write_private
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -121,6 +129,13 @@ class HaierCloudDriver:
             timeout=timeout, headers={"user-agent": "haier-control/0.1"}
         )
         self._devices: dict[str, CloudDevice] = {}
+        self._inventory_path = session_path.with_name("haier-devices.enc")
+        self._credentials_path = session_path.with_name("haier-credentials.enc")
+        self._inventory_checked = 0.0
+        self._inventory_loaded = False
+        self._inventory_lock = asyncio.Lock()
+        self._auth_lock = asyncio.Lock()
+        self._auth_retry_after = 0.0
         self.last_error: str | None = None
 
     @property
@@ -130,6 +145,18 @@ class HaierCloudDriver:
         )
 
     async def start(self) -> None:
+        try:
+            if self._inventory_path.exists():
+                inventory = self._box.decrypt_json(self._inventory_path.read_bytes())
+                restored = {}
+                for item in inventory["devices"]:
+                    item["capabilities"] = DeviceCapabilities.model_validate(item["capabilities"])
+                    device = CloudDevice(**item)
+                    restored[device.public_id] = device
+                self._devices = restored
+                self._inventory_loaded = True
+        except (OSError, KeyError, TypeError, ValueError):
+            _LOGGER.warning("Local appliance inventory unavailable; discovery will rebuild it")
         if not self._session_path.exists():
             self.last_error = "Haier authentication has not been bootstrapped"
             return
@@ -152,11 +179,54 @@ class HaierCloudDriver:
         self.last_error = None
 
     def _persist_tokens(self, tokens: HaierTokens) -> None:
-        self._session_path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
-        temporary = self._session_path.with_suffix(".tmp")
-        temporary.write_bytes(self._box.encrypt_json(tokens.as_dict()))
-        temporary.chmod(0o600)
-        temporary.replace(self._session_path)
+        write_private(self._session_path, self._box.encrypt_json(tokens.as_dict()))
+
+    def configure_credentials(self, email: str, password: str) -> None:
+        write_private(
+            self._credentials_path,
+            self._box.encrypt_json({"email": email, "password": password}),
+        )
+
+    async def _recover_session(self, previous: HaierTokens | None) -> None:
+        async with self._auth_lock:
+            if self._tokens is not previous:
+                return  # another request already renewed the session
+            if time.monotonic() < self._auth_retry_after:
+                raise DriverUnavailable(self.last_error or "Haier authentication retry pending")
+            try:
+                try:
+                    if not self._tokens:
+                        raise HaierAuthenticationError("No saved session")
+                    tokens = await self._auth.refresh(
+                        self._tokens.refresh_token, self._tokens.mobile_id
+                    )
+                except (HaierAuthenticationError, httpx.HTTPStatusError) as exc:
+                    if isinstance(exc, httpx.HTTPStatusError) and exc.response.status_code not in {
+                        400,
+                        401,
+                        403,
+                    }:
+                        raise
+                    credentials = self._box.decrypt_json(self._credentials_path.read_bytes())
+                    try:
+                        tokens = await self._auth.login(
+                            credentials["email"], credentials["password"]
+                        )
+                    finally:
+                        credentials.clear()
+                self.store_tokens(tokens)
+                self._auth_retry_after = 0.0
+            except Exception as exc:
+                self._auth_retry_after = time.monotonic() + 300
+                transient = isinstance(exc, httpx.TransportError) or (
+                    isinstance(exc, httpx.HTTPStatusError) and exc.response.status_code >= 429
+                )
+                self.last_error = (
+                    "Haier authentication service temporarily unavailable"
+                    if transient
+                    else f"Haier reauthentication required ({type(exc).__name__})"
+                )
+                raise DriverUnavailable(self.last_error) from exc
 
     def _headers(self) -> dict[str, str]:
         if not self._tokens:
@@ -167,22 +237,37 @@ class HaierCloudDriver:
             "id-token": self._tokens.id_token,
         }
 
+    def saved_credentials(self) -> dict[str, str] | None:
+        if not self._credentials_path.exists():
+            return None
+        data = self._box.decrypt_json(self._credentials_path.read_bytes())
+        if not isinstance(data.get("email"), str) or not isinstance(data.get("password"), str):
+            raise ValueError("Saved credentials are invalid")
+        return {"email": data["email"], "password": data["password"]}
+
     async def _request(self, method: str, path: str, **kwargs: Any) -> dict[str, Any]:
+        if self._tokens is None:
+            await self._recover_session(None)
+        previous = self._tokens
         response = await self._client.request(
             method, f"{API_URL}{path}", headers=self._headers(), **kwargs
         )
         if response.status_code in {401, 403} and self._tokens:
-            try:
-                self._tokens = await self._auth.refresh(
-                    self._tokens.refresh_token, self._tokens.mobile_id
-                )
-                self._persist_tokens(self._tokens)
-            except Exception as exc:  # the public error is fixed; vendor data is never logged
-                self.last_error = f"Haier reauthentication required ({type(exc).__name__})"
-                raise DriverUnavailable(self.last_error) from exc
+            await self._recover_session(previous)
+            # Full login creates a new mobile identity; retry with matching metadata.
+            body = kwargs.get("json")
+            if isinstance(body, dict) and self._tokens:
+                if "deviceId" in body:
+                    body["deviceId"] = self._tokens.mobile_id
+                if isinstance(body.get("device"), dict) and "mobileId" in body["device"]:
+                    body["device"]["mobileId"] = self._tokens.mobile_id
             response = await self._client.request(
                 method, f"{API_URL}{path}", headers=self._headers(), **kwargs
             )
+            if response.status_code in {401, 403}:
+                self._auth_retry_after = time.monotonic() + 300
+                self.last_error = "Haier reauthentication required (renewed session rejected)"
+                raise DriverUnavailable(self.last_error)
         if response.status_code == 429:
             raise DriverUnavailable("Haier cloud rate limit reached; retry later")
         if response.status_code >= 500:
@@ -199,6 +284,29 @@ class HaierCloudDriver:
         return data
 
     async def list_devices(self) -> list[DeviceSummary]:
+        async with self._inventory_lock:
+            if not self._inventory_loaded or time.monotonic() - self._inventory_checked >= 3600:
+                try:
+                    await self._discover_devices()
+                except (DriverUnavailable, httpx.HTTPError):
+                    if not self._inventory_loaded:
+                        raise
+                    _LOGGER.warning("Discovery unavailable; using saved appliance inventory")
+                finally:
+                    self._inventory_checked = time.monotonic()
+            return [
+                DeviceSummary(
+                    id=device.public_id,
+                    name=device.name,
+                    model=device.model,
+                    capabilities=device.capabilities or DeviceCapabilities(modes=[]),
+                )
+                for device in self._devices.values()
+            ]
+
+    async def _discover_devices(self) -> None:
+        if not self._tokens:
+            await self._recover_session(None)
         tokens = self._tokens
         if not tokens:
             raise DriverUnavailable(self.last_error or "Haier authentication is unavailable")
@@ -230,10 +338,7 @@ class HaierCloudDriver:
             # The appliance-list response names this field "applianceTypeName" (the
             # outgoing command/context calls below use the differently-named
             # "applianceType" key instead -- an asymmetric hOn API naming quirk).
-            if (
-                not isinstance(item, dict)
-                or str(item.get("applianceTypeName", "")).upper() != "AC"
-            ):
+            if not isinstance(item, dict) or str(item.get("applianceTypeName", "")).upper() != "AC":
                 continue
             mac = str(item.get("macAddress", ""))
             if not mac:
@@ -252,15 +357,15 @@ class HaierCloudDriver:
             await self._ensure_schema(device)
             found[public_id] = device
         self._devices = found
-        return [
-            DeviceSummary(
-                id=device.public_id,
-                name=device.name,
-                model=device.model,
-                capabilities=device.capabilities or DeviceCapabilities(modes=[]),
+        inventory = []
+        for device in found.values():
+            item = asdict(device)
+            item["capabilities"] = (
+                device.capabilities.model_dump(mode="json") if device.capabilities else {}
             )
-            for device in found.values()
-        ]
+            inventory.append(item)
+        write_private(self._inventory_path, self._box.encrypt_json({"devices": inventory}))
+        self._inventory_loaded = True
 
     async def _ensure_schema(self, device: CloudDevice) -> None:
         params: dict[str, Any] = {
@@ -320,12 +425,10 @@ class HaierCloudDriver:
             temperature_step=_number(temp.get("incrementValue")),
             fan_modes=[FAN_FROM_RAW[value] for value in fan_raw if value in FAN_FROM_RAW],
             vertical_swing=[
-                "swing" if value == "8" else f"position_{value}"
-                for value in vertical_raw
+                "swing" if value == "8" else f"position_{value}" for value in vertical_raw
             ],
             horizontal_swing=[
-                "swing" if value == "7" else f"position_{value}"
-                for value in horizontal_raw
+                "swing" if value == "7" else f"position_{value}" for value in horizontal_raw
             ],
             advanced=advanced,
         )
@@ -383,14 +486,10 @@ class HaierCloudDriver:
             target_temperature=_number(settings.get("tempSel")),
             room_temperature=_number(settings.get("tempIndoor")),
             fan_mode=FAN_FROM_RAW.get(str(settings.get("windSpeed"))),
-            vertical_swing=(
-                "swing" if str(vertical) == "8" else f"position_{vertical}"
-            )
+            vertical_swing=("swing" if str(vertical) == "8" else f"position_{vertical}")
             if vertical is not None
             else None,
-            horizontal_swing=(
-                "swing" if str(horizontal) == "7" else f"position_{horizontal}"
-            )
+            horizontal_swing=("swing" if str(horizontal) == "7" else f"position_{horizontal}")
             if horizontal is not None
             else None,
             advanced=advanced,

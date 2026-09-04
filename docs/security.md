@@ -3,8 +3,9 @@
 ## Trust boundary
 
 The default bind address is loopback. A homelab deployment may bind one selected LAN
-address and port, but must not publish or tunnel it to the internet. No API route except
-`/healthz` is anonymously usable. The HTML shell is public but contains no device data.
+address and port, but must not publish or tunnel it to the internet. Health and initial
+setup routes are public; device, command and timer routes require authentication.
+The HTML shell is public but contains no device data.
 
 HTTP does not encrypt hOn credentials or local API tokens. The web pairing flow is an
 explicit convenience for a trusted LAN; CLI bootstrap or local HTTPS is safer.
@@ -21,24 +22,34 @@ explicit convenience for a trusted LAN; CLI bootstrap or local HTTPS is safer.
 - Password fields use appropriate browser autocomplete hints but are cleared after each
   submission. Responses have `Cache-Control: no-store`, `Referrer-Policy: no-referrer`,
   and framing disabled.
-- Only encrypted token material is persisted. The password is requested again only when
-  refresh fails and full reauthentication is required.
+- Session tokens are encrypted. Automatic mode also encrypts recovery credentials in
+  `/data/haier-credentials.enc`, so an expired refresh token does not require reconfiguration.
+  Interactive-only passwords and OTPs are not persisted.
 
 Automatic authentication is opt-in. A reusable encrypted session always wins. With file
 mode, both credential files must be regular `0600` files mounted read-only; they are read
-once only when reauthentication is required. Direct `HAIER_HON_EMAIL` and
+at startup to update the encrypted recovery copy. Direct `HAIER_HON_EMAIL` and
 `HAIER_HON_PASSWORD` variables are a convenience mode and remain visible in the container
 configuration to Docker, DockerHand, and host administrators. File mode wins over direct
 variables, and any incomplete or unsafe pair fails closed to the interactive UI without a
-retry loop. An MFA challenge retains only the short-lived Salesforce cookie session and
-asks the browser for the OTP; it never rereads or resubmits the password.
+immediate retry loop. Recovery first refreshes the saved token, then uses saved credentials
+only when refresh is rejected. Concurrent renewals share a lock; failed attempts back off
+for five minutes. Network failures do not trigger a password login. An MFA challenge may
+still require interactive verification; the app cannot bypass a vendor challenge.
 
 ## Local API
 
-Tokens contain at least 256 bits of randomness and are shown once. SQLite stores an
+Tokens contain at least 256 bits of randomness. SQLite stores an
 HMAC-SHA-256 digest keyed by the master secret, never the token. Scopes are `read`,
 `control`, and `timers`. Rate limits are intentionally conservative and command
 fingerprints suppress rapid duplicate physical actions.
+
+The first browser token is temporarily recoverable in encrypted `browser-setup.enc`.
+Setup status reads do not consume it. The browser saves it in localStorage before sending
+an authenticated acknowledgment using that token; acknowledgment deletes the encrypted
+delivery copy. Until acknowledgment, trusted-LAN clients can obtain this initial token
+through the setup route. Existing token hashes and browser tokens are unchanged on upgrade.
+Clearing browser storage or using another browser still requires a local API token.
 
 ## Threat model
 
@@ -51,5 +62,4 @@ and receives only the one secret it needs.
 File credentials protect against accidental disclosure in Compose values and container
 inspection; they do not protect against host root, the Docker daemon, or a compromised
 running process. Direct environment credentials additionally remain visible in Docker
-metadata. Automatic mode may deliver the first local API token once to the first browser
-that opens the LAN UI, so it assumes the selected LAN is trusted just like web pairing.
+metadata. The setup delivery described above assumes the selected LAN is trusted.

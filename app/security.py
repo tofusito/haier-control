@@ -4,10 +4,28 @@ import base64
 import hashlib
 import hmac
 import json
+import os
 import secrets
+import tempfile
+from pathlib import Path
 from typing import Any
 
 from cryptography.fernet import Fernet, InvalidToken
+
+
+def write_private(path: Path, data: bytes) -> None:
+    """Replace a private file atomically, including across process crashes."""
+    path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    fd, name = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
+    try:
+        with os.fdopen(fd, "wb") as stream:
+            stream.write(data)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(name, path)
+    finally:
+        if os.path.exists(name):
+            os.unlink(name)
 
 
 def new_api_token() -> str:
