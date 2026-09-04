@@ -365,13 +365,6 @@ class HaierCloudDriver:
         settings = {
             key: _value(value) for key, value in shadow_params.items() if isinstance(key, str)
         }
-        direct = {key: _value(value) for key, value in payload.items() if key != "shadow"}
-        if "tempIndoor" not in direct:
-            _LOGGER.info(
-                "Haier context response direct_keys=%s shadow_param_keys=%s",
-                sorted(direct.keys()),
-                sorted(settings.keys()),
-            )
         event = payload.get("lastConnEvent")
         online = not (isinstance(event, dict) and event.get("category") == "DISCONNECTED")
         mode = MODE_FROM_RAW.get(str(settings.get("machMode")))
@@ -388,7 +381,7 @@ class HaierCloudDriver:
             power=str(settings.get("onOffStatus")) == "1" if "onOffStatus" in settings else None,
             mode=mode,
             target_temperature=_number(settings.get("tempSel")),
-            room_temperature=_number(direct.get("tempIndoor")),
+            room_temperature=_number(settings.get("tempIndoor")),
             fan_mode=FAN_FROM_RAW.get(str(settings.get("windSpeed"))),
             vertical_swing=(
                 "swing" if str(vertical) == "8" else f"position_{vertical}"

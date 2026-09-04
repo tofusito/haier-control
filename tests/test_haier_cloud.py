@@ -154,3 +154,62 @@ async def test_list_devices_reads_capabilities_from_set_parameters(
     assert len(devices) == 1
     assert devices[0].capabilities.modes
     assert devices[0].capabilities.temperature_max == 32
+
+
+@pytest.mark.asyncio
+async def test_get_state_reads_room_temperature_from_the_shadow_not_the_envelope(
+    tmp_path: Path,
+) -> None:
+    """Reproduces the real symptom: both AC cards showed live power/mode/target
+    temperature but "Sin dato de ambiente" (no room temperature) even after the
+    discovery and capability fixes. /commands/v1/context nests tempIndoor inside
+    shadow.parameters alongside machMode/tempSel/windSpeed -- confirmed live --
+    not in the response's top-level envelope where the old code read it.
+    """
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/unified-api/v1/view/appliance-list":
+            return httpx.Response(
+                200,
+                json={
+                    "modules": {
+                        "applianceList": {
+                            "payload": {
+                                "appliances": [
+                                    {
+                                        "applianceTypeName": "AC",
+                                        "macAddress": "AA:BB:CC:DD:EE:FF",
+                                        "nickName": "Salón",
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+            )
+        if request.url.path == "/commands/v1/retrieve":
+            return httpx.Response(200, json={"payload": {"resultCode": "0"}})
+        assert request.url.path == "/commands/v1/context"
+        return httpx.Response(
+            200,
+            json={
+                "payload": {
+                    "shadow": {
+                        "parameters": {
+                            "onOffStatus": "1",
+                            "tempIndoor": "24.5",
+                            "tempSel": "26",
+                        }
+                    }
+                }
+            },
+        )
+
+    driver = _driver(tmp_path, httpx.MockTransport(handler))
+    try:
+        devices = await driver.list_devices()
+        state = await driver.get_state(devices[0].id)
+    finally:
+        await driver.close()
+
+    assert state.room_temperature == 24.5
