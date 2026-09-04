@@ -33,7 +33,7 @@ inventory() {
   while read -r id; do
     [[ -z "${id}" ]] && continue
     docker inspect --format \
-      '{{.Name}}|{{.Id}}|{{.Image}}|{{.State.Status}}|{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' \
+      '{{.Name}}|{{.Id}}|{{.Image}}|{{.State.Status}}|{{if index .State "Health"}}{{(index .State "Health").Status}}{{else}}none{{end}}' \
       "${id}"
   done < <(docker ps -aq --filter label=com.docker.compose.project=homeassistant) | sort
 }
@@ -41,7 +41,7 @@ inventory() {
 wait_for_health() {
   local attempt state
   for attempt in $(seq 1 60); do
-    state="$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' "${SERVICE}" 2>/dev/null || true)"
+    state="$(docker inspect --format '{{if index .State "Health"}}{{(index .State "Health").Status}}{{else}}{{.State.Status}}{{end}}' "${SERVICE}" 2>/dev/null || true)"
     [[ "${state}" == "healthy" ]] && return 0
     [[ "${state}" == "exited" || "${state}" == "dead" ]] && return 1
     sleep 2

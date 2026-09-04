@@ -58,7 +58,7 @@ async def manager(tmp_path: Path, mode: str) -> tuple[SetupFlowManager, FakeDriv
         "client",
         pairing_ttl=10,
         flow_ttl=10,
-        session_factory=lambda: session,  # type: ignore[arg-type]
+        session_factory=lambda: session,  # type: ignore[arg-type,return-value]
     )
     value._pairing_digest = token_hash("pairing-token-that-is-long", b"k" * 40)
     value._pairing_expires_at = time.monotonic() + 10
