@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import hmac
 import json
+import logging
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
@@ -22,6 +23,8 @@ from app.models import (
     DeviceSummary,
 )
 from app.security import SecretBox
+
+_LOGGER = logging.getLogger(__name__)
 
 MODE_FROM_RAW = {
     "0": DeviceMode.AUTO,
@@ -210,6 +213,18 @@ class HaierCloudDriver:
             raise DriverUnavailable("Haier appliance-list response schema changed") from exc
         if not isinstance(appliances, list):
             raise DriverUnavailable("Haier appliance-list did not contain a list")
+        _LOGGER.info(
+            "Haier appliance-list appliance_count=%d types=%s has_mac=%s",
+            len(appliances),
+            sorted(
+                {
+                    str(item.get("applianceType", "<missing>"))
+                    for item in appliances
+                    if isinstance(item, dict)
+                }
+            ),
+            [bool(item.get("macAddress")) for item in appliances if isinstance(item, dict)],
+        )
         found: dict[str, CloudDevice] = {}
         for item in appliances:
             if not isinstance(item, dict) or str(item.get("applianceType", "")).upper() != "AC":
