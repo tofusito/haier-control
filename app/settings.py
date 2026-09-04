@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from pydantic import Field
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -23,6 +23,10 @@ class Settings(BaseSettings):
         "3MVG9QDx8IX8nP5T2Ha8ofvlmjLZl5L_gvfbT9."
         "HJvpHGKoAS_dcMN8LYpTSYeVFCraUnV.2Ag1Ki7m4znVO6"
     )
+    hon_email: str | None = None
+    hon_password: SecretStr | None = None
+    hon_email_file: Path | None = None
+    hon_password_file: Path | None = None
 
 
 def load_secret(path: Path, *, required: bool = True) -> bytes:

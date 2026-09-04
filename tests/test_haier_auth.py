@@ -7,9 +7,11 @@ from fastapi import status
 from app.drivers.haier_auth import (
     AUTH_USER_AGENT,
     HaierAuthenticationError,
+    HaierLoginNotAccepted,
     HaierPairingTokenError,
     HaierProtocolError,
     InteractiveHaierLogin,
+    _aura_redirect,
 )
 from app.main import _setup_failure
 
@@ -41,3 +43,42 @@ def test_setup_failure_categories_are_safe_and_actionable(
     assert response_status == expected_status
     assert category == expected_category
     assert str(error) not in detail
+
+
+def test_aura_redirect_uses_events_url_when_present() -> None:
+    payload = {"events": [{"attributes": {"values": {"url": "/finaltok?x=1"}}}]}
+
+    assert _aura_redirect(payload) == "/finaltok?x=1"
+
+
+def test_aura_redirect_accepts_a_navigable_return_value() -> None:
+    payload = {"actions": [{"state": "SUCCESS", "returnValue": "/finaltok?x=1"}]}
+
+    assert _aura_redirect(payload) == "/finaltok?x=1"
+
+
+def test_aura_redirect_flags_a_rejected_login() -> None:
+    payload = {
+        "actions": [
+            {"state": "SUCCESS", "returnValue": "invalid username or password combination"}
+        ]
+    }
+
+    with pytest.raises(HaierLoginNotAccepted):
+        _aura_redirect(payload)
+
+
+def test_aura_redirect_reports_a_safe_shape_for_success_without_redirect() -> None:
+    """Reproduces the real symptom: Salesforce accepts the login (action state
+    SUCCESS) but the response carries no events/redirect. The diagnostic shape
+    embedded in the exception message must stay structural (no PII) so it can be
+    logged safely, while the client-facing detail (tested above) never includes it.
+    """
+    payload = {"actions": [{"state": "SUCCESS", "returnValue": None}]}
+
+    with pytest.raises(HaierProtocolError) as excinfo:
+        _aura_redirect(payload)
+
+    message = str(excinfo.value)
+    assert "action_state': 'SUCCESS'" in message
+    assert "event_count': None" in message

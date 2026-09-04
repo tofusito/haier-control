@@ -13,11 +13,17 @@ from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.auth import require_scope
+from app.automatic_auth import (
+    AutomaticCredentialError,
+    clear_direct_credentials,
+    load_automatic_credentials,
+)
 from app.controller import Controller
 from app.database import Database
 from app.drivers.base import Driver, DriverError
 from app.drivers.haier_auth import (
     HaierAuthenticationError,
+    HaierLoginNotAccepted,
     HaierPairingTokenError,
     HaierProtocolError,
 )
@@ -33,6 +39,7 @@ from app.models import (
     HaierSetupResend,
     HaierSetupResponse,
     HaierSetupStart,
+    HaierSetupStatusResponse,
     HealthResponse,
     TimerCreate,
     TimerUpdate,
@@ -56,6 +63,14 @@ def _setup_failure(exc: Exception) -> tuple[int, str, str]:
             status.HTTP_400_BAD_REQUEST,
             "El token de emparejamiento no es válido o ya se usó. Solicita uno nuevo.",
             "pairing_token",
+        )
+    if isinstance(exc, HaierLoginNotAccepted):
+        return (
+            status.HTTP_400_BAD_REQUEST,
+            "Salesforce ejecutó el login pero no devolvió el redirect esperado. Las "
+            "credenciales pueden ser correctas; usa el fallback interactivo y revisa "
+            "la compatibilidad del flujo antes de reintentar.",
+            "login_not_accepted",
         )
     if isinstance(exc, HaierProtocolError):
         return (
@@ -137,6 +152,37 @@ def create_app(
         app.state.rate_limiter = RateLimiter()
         app.state.setup_manager = setup_manager
         await selected_driver.start()
+        if isinstance(selected_driver, HaierCloudDriver) and selected_driver.requires_reauth:
+            automatic = None
+            try:
+                automatic = load_automatic_credentials(config)
+                if automatic:
+                    _LOGGER.info("Starting one automatic hOn login source=%s", automatic.source)
+                    await setup_manager.begin_automatic(automatic.email, automatic.password)
+            except AutomaticCredentialError as exc:
+                detail = (
+                    "La autenticación automática está mal configurada. Corrige ambos "
+                    "secretos privados o usa el pairing manual."
+                )
+                setup_manager.set_automatic_failure(detail)
+                _LOGGER.warning(
+                    "Automatic hOn setup failed category=configuration exception=%s",
+                    type(exc).__name__,
+                )
+            except Exception as exc:
+                _error_status, detail, category = _setup_failure(exc)
+                setup_manager.set_automatic_failure(detail)
+                _LOGGER.warning(
+                    "Automatic hOn setup failed category=%s exception=%s detail=%s",
+                    category,
+                    type(exc).__name__,
+                    str(exc),
+                )
+            finally:
+                if automatic:
+                    automatic.email = ""
+                    automatic.password = ""
+                clear_direct_credentials(config)
         setup_manager.ensure_pairing()
         await scheduler.start()
         yield
@@ -207,11 +253,21 @@ def create_app(
         except Exception as exc:
             error_status, detail, category = _setup_failure(exc)
             _LOGGER.warning(
-                "Haier setup failed category=%s exception=%s",
+                "Haier setup failed category=%s exception=%s detail=%s",
                 category,
                 type(exc).__name__,
+                str(exc),
             )
             raise HTTPException(error_status, detail) from exc
+
+    @app.get(
+        "/api/v1/setup/haier/status",
+        response_model=HaierSetupStatusResponse,
+        tags=["setup"],
+    )
+    async def haier_setup_status(request: Request) -> HaierSetupStatusResponse:
+        manager = cast(SetupFlowManager, request.app.state.setup_manager)
+        return manager.automatic_status()
 
     @app.post(
         "/api/v1/setup/haier/otp",

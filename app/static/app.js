@@ -206,8 +206,22 @@ $("#connectionButton").addEventListener("click", refresh);
 setInterval(() => { $$('[data-countdown]').forEach(node => node.textContent = countdown(node.dataset.countdown)); }, 1000);
 async function boot() {
   try {
+    const setup = await fetch("/api/v1/setup/haier/status", { cache:"no-store" }).then(response => response.json());
+    if (setup.status === "complete" && setup.api_token) {
+      state.token = setup.api_token; sessionStorage.setItem("haierToken", setup.api_token);
+    }
+    if (setup.status === "mfa_required") {
+      state.setupFlow = { id:setup.flow_id, csrf:setup.csrf_token };
+      $("#credentialsStep").classList.add("hidden"); $("#otpStep").classList.remove("hidden");
+      $("#setupEyebrow").textContent = "DOBLE FACTOR"; $("#setupTitle").textContent = "Revisa tu correo";
+      $("#haierSetupSubmit").textContent = "Verificar y conectar"; $("#haierSetupDialog").showModal(); return;
+    }
     const health = await fetch("/healthz", { cache:"no-store" }).then(response => response.json());
-    if (health.setup_required) { $("#setupEyebrow").textContent = state.token ? "RECONECTAR" : "CONFIGURACIÓN INICIAL"; $("#setupTitle").textContent = state.token ? "Reconectar con hOn" : "Conectar con hOn"; $("#haierSetupDialog").showModal(); return; }
+    if (health.setup_required) {
+      $("#setupEyebrow").textContent = state.token ? "RECONECTAR" : "CONFIGURACIÓN INICIAL"; $("#setupTitle").textContent = state.token ? "Reconectar con hOn" : "Conectar con hOn";
+      if (setup.status === "failed" && setup.message) $("#haierSetupError").textContent = setup.message;
+      $("#haierSetupDialog").showModal(); return;
+    }
   } catch (_) { setConnection(false, "Sin conexión"); }
   if (state.token) { refresh(); connectEvents(); } else openTokenDialog();
 }

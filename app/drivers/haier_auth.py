@@ -25,6 +25,10 @@ class HaierPairingTokenError(HaierAuthenticationError):
     pass
 
 
+class HaierLoginNotAccepted(HaierAuthenticationError):
+    pass
+
+
 class HaierProtocolError(HaierAuthenticationError):
     pass
 
@@ -173,6 +177,87 @@ def _parse_tokens(value: str) -> dict[str, str]:
     return result
 
 
+def _aura_response_shape(payload: Any) -> dict[str, Any]:
+    """Structural, redaction-safe summary of an Aura response for diagnostics.
+
+    Never includes field values (username/password/tokens/HTML), only types,
+    lengths and the action state, so it is safe to log.
+    """
+    if not isinstance(payload, dict):
+        return {"type": type(payload).__name__}
+    shape: dict[str, Any] = {"top_keys": sorted(payload.keys())}
+    events = payload.get("events")
+    shape["event_count"] = len(events) if isinstance(events, list) else None
+    actions = payload.get("actions")
+    if isinstance(actions, list) and actions and isinstance(actions[0], dict):
+        action = actions[0]
+        shape["action_state"] = action.get("state")
+        returned = action.get("returnValue")
+        shape["return_type"] = type(returned).__name__
+        shape["return_length"] = len(returned) if isinstance(returned, str) else None
+    else:
+        shape["action_count"] = len(actions) if isinstance(actions, list) else None
+    shape["has_error"] = payload.get("error") is not None
+    return shape
+
+
+def _aura_redirect(payload: Any) -> str:
+    """Extract a successful Aura handoff without exposing rejection text."""
+    if not isinstance(payload, dict):
+        raise HaierProtocolError("Aura login response was not an object")
+    try:
+        redirect = payload["events"][0]["attributes"]["values"]["url"]
+    except (KeyError, IndexError, TypeError):
+        redirect = None
+    if isinstance(redirect, str) and redirect:
+        return redirect
+
+    actions = payload.get("actions")
+    if isinstance(actions, list) and actions and isinstance(actions[0], dict):
+        returned = actions[0].get("returnValue")
+        if isinstance(returned, str) and returned.startswith(("/", "http://", "https://")):
+            return returned
+        lowered = returned.lower() if isinstance(returned, str) else ""
+        if "username" in lowered and "password" in lowered:
+            raise HaierLoginNotAccepted("Salesforce did not return a login redirect")
+    shape = _aura_response_shape(payload)
+    raise HaierProtocolError(
+        f"Aura login response did not include a safe redirect (shape={shape})"
+    )
+
+
+def _login_payload(
+    email: str,
+    password: str,
+    fwuid: str,
+    loaded: dict[str, Any],
+    page_uri: str,
+) -> tuple[str, dict[str, int]]:
+    start_url = unquote(page_uri.rsplit("startURL=", 1)[-1]).split("%3D")[0]
+    action = {
+        "id": "79;a",
+        "descriptor": "apex://LightningLoginCustomController/ACTION$login",
+        "callingDescriptor": "markup://c:loginForm",
+        "params": {"username": email, "password": password, "startUrl": start_url},
+    }
+    form: dict[str, Any] = {
+        "message": {"actions": [action]},
+        "aura.context": {
+            "mode": "PROD",
+            "fwuid": fwuid,
+            "app": "siteforce:loginApp2",
+            "loaded": loaded,
+            "dn": [],
+            "globals": {},
+            "uad": False,
+        },
+        "aura.pageURI": page_uri,
+        "aura.token": None,
+    }
+    body = "&".join(f"{key}={quote(json.dumps(value))}" for key, value in form.items())
+    return body, {"r": 3, "other.LightningLoginCustom.login": 1}
+
+
 class HaierAuthenticator:
     """Independent, minimal implementation of the documented Salesforce flow.
 
@@ -229,41 +314,18 @@ class HaierAuthenticator:
             fwuid, loaded_raw = match.groups()
             loaded = json.loads(loaded_raw)
             page_uri = str(login_page.url).replace(AUTH_API, "")
-            start_url = unquote(page_uri.rsplit("startURL=", 1)[-1]).split("%3D")[0]
-            action = {
-                "id": "79;a",
-                "descriptor": "apex://LightningLoginCustomController/ACTION$login",
-                "callingDescriptor": "markup://c:loginForm",
-                "params": {"username": email, "password": password, "startUrl": start_url},
-            }
-            form: dict[str, Any] = {
-                "message": {"actions": [action]},
-                "aura.context": {
-                    "mode": "PROD",
-                    "fwuid": fwuid,
-                    "app": "siteforce:loginApp2",
-                    "loaded": loaded,
-                    "dn": [],
-                    "globals": {},
-                    "uad": False,
-                },
-                "aura.pageURI": page_uri,
-                "aura.token": None,
-            }
-            encoded = "&".join(f"{key}={quote(json.dumps(value))}" for key, value in form.items())
+            encoded, params = _login_payload(email, password, fwuid, loaded, page_uri)
             login = await client.post(
                 f"{AUTH_API}/s/sfsites/aura",
-                params={"r": 3, "other.LightningLoginCustom.login": 1},
+                params=params,
                 content=encoded,
                 headers={"content-type": "application/x-www-form-urlencoded"},
             )
             login.raise_for_status()
             try:
-                redirect = login.json()["events"][0]["attributes"]["values"]["url"]
-            except (KeyError, IndexError, TypeError, json.JSONDecodeError) as exc:
-                raise HaierAuthenticationError(
-                    "Login was rejected or the response schema changed"
-                ) from exc
+                redirect = _aura_redirect(login.json())
+            except json.JSONDecodeError as exc:
+                raise HaierProtocolError("Aura login response was unreadable") from exc
 
             handoff = await client.get(_safe_auth_url(str(redirect)))
             handoff.raise_for_status()
@@ -372,50 +434,20 @@ class InteractiveHaierLogin:
             raise HaierProtocolError("Salesforce login schema changed (fwuid missing)")
         fwuid, loaded_raw = match.groups()
         page_uri = str(login_page.url).replace(AUTH_API, "")
-        start_url = unquote(page_uri.rsplit("startURL=", 1)[-1]).split("%3D")[0]
-        form: dict[str, Any] = {
-            "message": {
-                "actions": [
-                    {
-                        "id": "79;a",
-                        "descriptor": "apex://LightningLoginCustomController/ACTION$login",
-                        "callingDescriptor": "markup://c:loginForm",
-                        "params": {
-                            "username": email,
-                            "password": password,
-                            "startUrl": start_url,
-                        },
-                    }
-                ]
-            },
-            "aura.context": {
-                "mode": "PROD",
-                "fwuid": fwuid,
-                "app": "siteforce:loginApp2",
-                "loaded": json.loads(loaded_raw),
-                "dn": [],
-                "globals": {},
-                "uad": False,
-            },
-            "aura.pageURI": page_uri,
-            "aura.token": None,
-        }
-        encoded = "&".join(
-            f"{key}={quote(json.dumps(value))}" for key, value in form.items()
+        encoded, params = _login_payload(
+            email, password, fwuid, json.loads(loaded_raw), page_uri
         )
         login = await self.client.post(
             f"{AUTH_API}/s/sfsites/aura",
-            params={"r": 3, "other.LightningLoginCustom.login": 1},
+            params=params,
             content=encoded,
             headers={"content-type": "application/x-www-form-urlencoded"},
         )
         login.raise_for_status()
         try:
-            redirect = login.json()["events"][0]["attributes"]["values"]["url"]
-        except (KeyError, IndexError, TypeError, json.JSONDecodeError) as exc:
-            raise HaierAuthenticationError(
-                "Login was rejected or the response schema changed"
-            ) from exc
+            redirect = _aura_redirect(login.json())
+        except json.JSONDecodeError as exc:
+            raise HaierProtocolError("Aura login response was unreadable") from exc
         handoff = await self.client.get(_safe_auth_url(str(redirect)))
         handoff.raise_for_status()
         href = _first_navigation_target(handoff.text)

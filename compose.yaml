@@ -10,8 +10,17 @@ services:
     environment:
       HAIER_DRIVER: ${HAIER_DRIVER:-mock}
       HAIER_LOG_LEVEL: ${HAIER_LOG_LEVEL:-INFO}
+      # Convenience mode (opt-in): uncomment both. These values are visible to
+      # Docker inspect, Compose UIs, and host administrators.
+      # HAIER_HON_EMAIL: ${HAIER_HON_EMAIL}
+      # HAIER_HON_PASSWORD: ${HAIER_HON_PASSWORD}
+      # Recommended automatic mode: uncomment both together with the two mounts below.
+      # HAIER_HON_EMAIL_FILE: /run/secrets/haier_hon_email
+      # HAIER_HON_PASSWORD_FILE: /run/secrets/haier_hon_password
     volumes:
       - ./data:/data
+      # - ./secrets/hon_email:/run/secrets/haier_hon_email:ro
+      # - ./secrets/hon_password:/run/secrets/haier_hon_password:ro
     secrets:
       - haier_control_master_key
     read_only: true

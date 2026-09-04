@@ -15,7 +15,7 @@ from app.drivers.haier_auth import (
     InteractiveHaierLogin,
 )
 from app.drivers.haier_cloud import HaierCloudDriver
-from app.models import HaierSetupResponse
+from app.models import HaierSetupResponse, HaierSetupStatusResponse
 from app.security import new_api_token, token_hash
 
 _LOGGER = logging.getLogger(__name__)
@@ -55,6 +55,9 @@ class SetupFlowManager:
         self._pairing_expires_at = 0.0
         self._flows: dict[str, PendingFlow] = {}
         self._lock = asyncio.Lock()
+        self._automatic_flow_id: str | None = None
+        self._automatic_failure: str | None = None
+        self._pending_api_token: str | None = None
 
     @property
     def setup_required(self) -> bool:
@@ -87,9 +90,27 @@ class SetupFlowManager:
                 raise HaierPairingTokenError("Pairing token is invalid or expired")
             self._pairing_digest = None
             self._pairing_expires_at = 0.0
+        return await self._begin_session(email, password)
+
+    async def begin_automatic(self, email: str, password: str) -> None:
+        """Attempt automatic login once; failures remain available to the manual UI."""
+        try:
+            result = await self._begin_session(email, password, automatic=True)
+        except Exception:
+            raise
+        else:
+            if result.status == "complete":
+                self._pending_api_token = result.api_token
+
+    async def _begin_session(
+        self, email: str, password: str, *, automatic: bool = False
+    ) -> HaierSetupResponse:
         session = self._session_factory()
         try:
             result = await session.begin(email, password)
+        except Exception:
+            await session.close()
+            raise
         finally:
             password = ""  # noqa: F841 - never retained after the handshake call
         if result:
@@ -104,6 +125,8 @@ class SetupFlowManager:
             csrf_token=csrf,
             expires_at=time.monotonic() + self.flow_ttl,
         )
+        if automatic:
+            self._automatic_flow_id = flow_id
         return HaierSetupResponse(
             status="mfa_required",
             flow_id=flow_id,
@@ -111,6 +134,36 @@ class SetupFlowManager:
             expires_in=self.flow_ttl,
             message="A verification code was sent by email",
         )
+
+    def set_automatic_failure(self, detail: str) -> None:
+        self._automatic_failure = detail
+
+    def automatic_status(self) -> HaierSetupStatusResponse:
+        if self._automatic_flow_id:
+            flow = self._flows.get(self._automatic_flow_id)
+            if flow and time.monotonic() < flow.expires_at:
+                return HaierSetupStatusResponse(
+                    status="mfa_required",
+                    flow_id=self._automatic_flow_id,
+                    csrf_token=flow.csrf_token,
+                    expires_in=max(0, int(flow.expires_at - time.monotonic())),
+                    message="Introduce el código que hOn envió por correo.",
+                )
+            self._automatic_flow_id = None
+        if self._automatic_failure:
+            return HaierSetupStatusResponse(
+                status="failed",
+                message=self._automatic_failure,
+            )
+        if not self.setup_required:
+            token = self._pending_api_token
+            self._pending_api_token = None
+            return HaierSetupStatusResponse(
+                status="complete",
+                api_token=token,
+                message="La sesión hOn está disponible.",
+            )
+        return HaierSetupStatusResponse(status="manual")
 
     async def submit_otp(self, flow_id: str, csrf_token: str, code: str) -> HaierSetupResponse:
         flow = await self._flow(flow_id, csrf_token)
@@ -125,7 +178,10 @@ class SetupFlowManager:
                 await self._discard(flow_id)
             raise
         try:
-            return await self._complete(tokens)
+            result = await self._complete(tokens)
+            if flow_id == self._automatic_flow_id:
+                self._automatic_flow_id = None
+            return result
         finally:
             await self._discard(flow_id)
 

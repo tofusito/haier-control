@@ -14,10 +14,13 @@ The encrypted hOn session is also stored in `/data/haier-session.enc`. The encry
 is supplied independently at `/run/secrets/haier_control_master_key`; it must never live in
 the volume or Git.
 
-The hOn password is intentionally absent from persistent storage. Access, ID, Cognito,
-and refresh tokens are encrypted. When refresh is no longer possible, the driver reports
-`setup_required`, the UI opens **Reconectar con hOn**, and existing timers remain in
-SQLite. They are not executed while control is unavailable; failure is visible.
+The hOn password is never written to `/data`. Access, ID, Cognito, and refresh tokens are
+encrypted. On startup a reusable encrypted session takes precedence; otherwise an
+optional pair of private files wins over optional direct environment credentials. Each
+automatic source is attempted once and references are cleared afterward. Failure falls
+back to **Reconectar con hOn**; an MFA challenge pauses in memory and the UI requests only
+the OTP. Existing timers remain in SQLite and are not executed while control is
+unavailable; failure is visible.
 
 ## Drivers
 

@@ -21,8 +21,8 @@ on/off timers without depending on Home Assistant at runtime.
   `timers` scopes. Commands are rate-limited, deduplicated, and audited.
 - `MockDriver` is fully functional. `HaierCloudDriver` is opt-in and uses REST polling;
   MQTT realtime is a documented future enhancement.
-- hOn login via an encrypted CLI flow or a short-lived web pairing flow, including
-  Salesforce email OTP. Passwords are never persisted.
+- hOn login through encrypted-session reuse, private credential files, direct environment
+  variables, CLI, or a short-lived web pairing flow, including Salesforce email OTP.
 
 ## Architecture
 
@@ -70,6 +70,35 @@ bootstrap inside the container instead:
 ```sh
 docker compose exec haier-control haier-control auth
 ```
+
+### Optional automatic hOn login
+
+Automatic login runs once at startup only when no encrypted hOn session can be reused.
+Precedence is: encrypted session, private files, direct environment variables, then the
+interactive UI. A successful login persists only encrypted session tokens. A failure
+falls back to manual pairing without retrying in a loop; an email MFA challenge opens the
+UI directly at the OTP step.
+
+Recommended file mode:
+
+```yaml
+environment:
+  HAIER_HON_EMAIL_FILE: /run/secrets/haier_hon_email
+  HAIER_HON_PASSWORD_FILE: /run/secrets/haier_hon_password
+volumes:
+  - ./secrets/hon_email:/run/secrets/haier_hon_email:ro
+  - ./secrets/hon_password:/run/secrets/haier_hon_password:ro
+```
+
+Both host files must be regular files with mode `0600`. Keep them outside Git and `/data`.
+The process reads them once, removes its in-memory references after the attempt, and never
+logs their contents.
+
+For a hobby installation that accepts a weaker host-side boundary, set both
+`HAIER_HON_EMAIL` and `HAIER_HON_PASSWORD`. Docker inspect, DockerHand, Compose output, and
+host administrators can read direct environment values in clear text. Haier Control never
+prints them, but cannot hide them from Docker. Do not combine direct values with file mode;
+the complete file pair wins.
 
 ## Development
 

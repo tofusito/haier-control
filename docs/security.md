@@ -24,6 +24,15 @@ explicit convenience for a trusted LAN; CLI bootstrap or local HTTPS is safer.
 - Only encrypted token material is persisted. The password is requested again only when
   refresh fails and full reauthentication is required.
 
+Automatic authentication is opt-in. A reusable encrypted session always wins. With file
+mode, both credential files must be regular `0600` files mounted read-only; they are read
+once only when reauthentication is required. Direct `HAIER_HON_EMAIL` and
+`HAIER_HON_PASSWORD` variables are a convenience mode and remain visible in the container
+configuration to Docker, DockerHand, and host administrators. File mode wins over direct
+variables, and any incomplete or unsafe pair fails closed to the interactive UI without a
+retry loop. An MFA challenge retains only the short-lived Salesforce cookie session and
+asks the browser for the OTP; it never rereads or resubmits the password.
+
 ## Local API
 
 Tokens contain at least 256 bits of randomness and are shown once. SQLite stores an
@@ -38,3 +47,9 @@ protect against a root compromise, a running-container compromise, malicious hos
 administration, or a browser/device that already holds an API token. SQLite and token
 files are mode `0600`; the container drops capabilities, uses a read-only root filesystem,
 and receives only the one secret it needs.
+
+File credentials protect against accidental disclosure in Compose values and container
+inspection; they do not protect against host root, the Docker daemon, or a compromised
+running process. Direct environment credentials additionally remain visible in Docker
+metadata. Automatic mode may deliver the first local API token once to the first browser
+that opens the LAN UI, so it assumes the selected LAN is trusted just like web pairing.

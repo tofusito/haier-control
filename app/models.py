@@ -176,3 +176,12 @@ class HaierSetupResponse(BaseModel):
     expires_in: int | None = None
     api_token: str | None = None
     message: str
+
+
+class HaierSetupStatusResponse(BaseModel):
+    status: Literal["manual", "mfa_required", "complete", "failed"]
+    flow_id: str | None = None
+    csrf_token: str | None = None
+    expires_in: int | None = None
+    api_token: str | None = None
+    message: str | None = None
