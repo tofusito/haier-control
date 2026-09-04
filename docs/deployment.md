@@ -7,7 +7,7 @@ The repository, runtime data, and secrets must be siblings but separate:
 ```text
 <runtime-root>/
   repository/       # clean Git checkout; public source of truth
-  data/             # /data: SQLite, audit, timers, encrypted hOn session
+  data/             # SQLite, timers, encrypted session/recovery credentials/AC inventory
   secrets/          # master_key and optional hon_email/hon_password, mode 0600
 ```
 
@@ -38,5 +38,13 @@ volume, and secret exist.
 For recommended automatic login, create `secrets/hon_email` and `secrets/hon_password`
 interactively on the host with mode `0600`, then add the two `_FILE` variables and
 read-only bind mounts from `deploy/homelab-service.template.yaml`. Never paste their values
-into DockerHand. Remove those four Compose lines to return to manual pairing; the encrypted
-session in `/data` remains reusable until hOn requires reauthentication.
+into DockerHand. Removing those four Compose lines no longer disables automatic recovery:
+the encrypted copy in `/data/haier-credentials.enc` remains available. To intentionally
+disable password recovery, remove the configured credential inputs and that encrypted
+recovery file, preserving `/data/haier-session.enc` and the master key. Existing sessions
+then remain reusable only while refresh is accepted.
+
+Upgrades preserve the existing session format and SQLite token hashes. Back up SQLite
+through its backup API and preserve the encrypted files before updating; keep the master
+key separately. Losing or replacing the master key invalidates both encrypted data and
+local token verification. The AC inventory can be rebuilt from the cloud.
