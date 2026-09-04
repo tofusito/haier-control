@@ -293,7 +293,13 @@ async function connectEvents() {
     const response = await fetch("/api/v1/events", { headers:{Authorization:`Bearer ${state.token}`}, signal:controller.signal });
     if (!response.ok || !response.body) return;
     const reader=response.body.getReader(), decoder=new TextDecoder(); let buffer="";
-    while (true) { const {done,value}=await reader.read(); if(done) break; buffer+=decoder.decode(value,{stream:true}); const blocks=buffer.split("\n\n"); buffer=blocks.pop(); if(blocks.some(block=>block.startsWith("event: device")||block.startsWith("event: timer"))) queueRefresh(); }
+    while (true) {
+      const {done,value}=await reader.read(); if(done) break;
+      buffer+=decoder.decode(value,{stream:true}); const blocks=buffer.split("\n\n"); buffer=blocks.pop();
+      const hasDeviceEvent = blocks.some(block=>block.startsWith("event: device"));
+      const hasTimerEvent = blocks.some(block=>block.startsWith("event: timer"));
+      if (hasDeviceEvent) queueRefresh(1200); else if (hasTimerEvent) queueRefresh();
+    }
   } catch (error) { if (error.name !== "AbortError") setTimeout(connectEvents, 5000); }
 }
 
