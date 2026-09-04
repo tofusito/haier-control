@@ -335,7 +335,10 @@ class HaierCloudDriver:
         command = device.commands.get("settings")
         if not isinstance(command, dict):
             return {}
-        params = command.get("parameters")
+        # The command-schema response names this group "setParameters" (confirmed
+        # live); unrelated to the "parameters" key used elsewhere for the outgoing
+        # command body and the /commands/v1/context state shadow.
+        params = command.get("setParameters")
         return params if isinstance(params, dict) else {}
 
     async def get_state(self, device_id: str) -> DeviceState:

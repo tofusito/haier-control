@@ -89,3 +89,62 @@ async def test_list_devices_skips_appliances_without_a_mac(tmp_path: Path) -> No
         await driver.close()
 
     assert devices == []
+
+
+@pytest.mark.asyncio
+async def test_list_devices_reads_capabilities_from_set_parameters(
+    tmp_path: Path,
+) -> None:
+    """Reproduces the real symptom on a live account with two working AC units
+    (AS25/AS35): once discovery was fixed, both devices showed live state but
+    capabilities.modes/fan_modes came back empty. The command-schema response
+    names the group "setParameters", not "parameters" (that name is used
+    elsewhere, for the outgoing command body and the context state shadow) --
+    confirmed live via the safe payload_keys/settings_command_keys diagnostic.
+    """
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/unified-api/v1/view/appliance-list":
+            return httpx.Response(
+                200,
+                json={
+                    "modules": {
+                        "applianceList": {
+                            "payload": {
+                                "appliances": [
+                                    {
+                                        "applianceTypeName": "AC",
+                                        "macAddress": "AA:BB:CC:DD:EE:FF",
+                                        "nickName": "Salón",
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+            )
+        assert request.url.path == "/commands/v1/retrieve"
+        return httpx.Response(
+            200,
+            json={
+                "payload": {
+                    "resultCode": "0",
+                    "settings": {
+                        "setParameters": {
+                            "machMode": {"enumValues": "0|1|4"},
+                            "tempSel": {"minimumValue": 16, "maximumValue": 32},
+                        }
+                    },
+                }
+            },
+        )
+
+    driver = _driver(tmp_path, httpx.MockTransport(handler))
+    try:
+        devices = await driver.list_devices()
+    finally:
+        await driver.close()
+
+    assert len(devices) == 1
+    assert devices[0].capabilities.modes
+    assert devices[0].capabilities.temperature_max == 32
