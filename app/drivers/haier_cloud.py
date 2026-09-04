@@ -218,7 +218,7 @@ class HaierCloudDriver:
             len(appliances),
             sorted(
                 {
-                    str(item.get("applianceType", "<missing>"))
+                    str(item.get("applianceTypeName", "<missing>"))
                     for item in appliances
                     if isinstance(item, dict)
                 }
@@ -227,7 +227,13 @@ class HaierCloudDriver:
         )
         found: dict[str, CloudDevice] = {}
         for item in appliances:
-            if not isinstance(item, dict) or str(item.get("applianceType", "")).upper() != "AC":
+            # The appliance-list response names this field "applianceTypeName" (the
+            # outgoing command/context calls below use the differently-named
+            # "applianceType" key instead -- an asymmetric hOn API naming quirk).
+            if (
+                not isinstance(item, dict)
+                or str(item.get("applianceTypeName", "")).upper() != "AC"
+            ):
                 continue
             mac = str(item.get("macAddress", ""))
             if not mac:
@@ -238,7 +244,7 @@ class HaierCloudDriver:
                 name=str(item.get("nickName") or item.get("modelName") or "Aire acondicionado"),
                 model=str(item.get("modelName") or item.get("applianceModelId") or "") or None,
                 mac=mac,
-                appliance_type=str(item.get("applianceType", "AC")),
+                appliance_type=str(item.get("applianceTypeName", "AC")),
                 model_id=str(item.get("applianceModelId", "")),
                 code=str(item.get("code", "")),
                 raw=item,
