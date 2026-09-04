@@ -50,3 +50,10 @@ Two AC write families are publicly documented: some write power/mode through `se
 others use `startProgram`/`stopProgram`. v0.1 safely supports the settings-based path and
 rejects an unadvertised control. Program-based units remain a known extension; the app
 must not guess a program envelope.
+
+The live AC schema nests writable values under `settings.setParameters.parameters` and
+metadata under `settings.setParameters.ancillaryParameters`. The outgoing envelope flattens
+these into its `parameters` and `ancillaryParameters` fields. Structured fixed metadata
+(such as `programRules`) stays JSON, not a Python string. A fresh context read supplies
+unchanged adjustable values and power state; only the requested control is overridden.
+Missing current mandatory values block dispatch rather than resetting them to defaults.

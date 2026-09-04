@@ -496,8 +496,9 @@ class HaierCloudDriver:
             updated_at=datetime.now(UTC),
         )
 
-    async def send_command(self, device_id: str, command: CommandRequest) -> CommandResult:
-        device = await self._device(device_id)
+    def _settings_values(
+        self, device: CloudDevice, command: CommandRequest, current: dict[str, Any]
+    ) -> tuple[dict[str, Any], dict[str, Any]]:
         settings = self._settings_parameters(device)
         raw_name, raw_value = self._raw_command(device, command)
         schema = settings.get(raw_name)
@@ -505,7 +506,7 @@ class HaierCloudDriver:
             raise UnsupportedCapability("The device did not advertise this control")
         parameters: dict[str, Any] = {}
         ancillary: dict[str, Any] = {}
-        command_def = device.commands.get("settings", {})
+        command_def = device.commands.get("settings", {}).get("setParameters", {})
         groups = (("parameters", parameters), ("ancillaryParameters", ancillary))
         for group_name, destination in groups:
             group = command_def.get(group_name, {}) if isinstance(command_def, dict) else {}
@@ -514,10 +515,44 @@ class HaierCloudDriver:
             for name, item in group.items():
                 if not isinstance(item, dict):
                     continue
-                if item.get("mandatory") or name == raw_name:
-                    chosen = raw_value if name == raw_name else _value(item)
-                    if chosen not in (None, ""):
-                        destination[name] = str(chosen)
+                if item.get("mandatory") in (1, True, "1") or name == raw_name:
+                    if group_name == "parameters" and name == raw_name:
+                        chosen = raw_value
+                    elif group_name == "parameters" and (
+                        "fixedValue" not in item or name == "onOffStatus"
+                    ):
+                        chosen = _value(current.get(name))
+                        if chosen in (None, ""):
+                            raise DriverUnavailable(
+                                "Current settings are incomplete; refresh before changing controls"
+                            )
+                    else:
+                        chosen = _value(item)
+                    if chosen in (None, ""):
+                        raise DriverUnavailable("Required command metadata is unavailable")
+                    destination[name] = chosen if isinstance(chosen, (dict, list)) else str(chosen)
+        if parameters.get(raw_name) != raw_value:
+            raise UnsupportedCapability("Requested parameter is missing from the command schema")
+        return parameters, ancillary
+
+    async def send_command(self, device_id: str, command: CommandRequest) -> CommandResult:
+        device = await self._device(device_id)
+        data = await self._request(
+            "GET",
+            "/commands/v1/context",
+            params={
+                "macAddress": device.mac,
+                "applianceType": device.appliance_type,
+                "category": "CYCLE",
+            },
+        )
+        try:
+            current = data["payload"]["shadow"]["parameters"]
+        except (KeyError, TypeError) as exc:
+            raise DriverUnavailable("Current settings are unavailable") from exc
+        if not isinstance(current, dict):
+            raise DriverUnavailable("Current settings are unavailable")
+        parameters, ancillary = self._settings_values(device, command, current)
         timestamp = datetime.now(UTC).isoformat(timespec="milliseconds").replace("+00:00", "Z")
         tokens = self._tokens
         assert tokens is not None
