@@ -29,8 +29,13 @@ compose() {
 }
 
 inventory() {
-  docker ps -a --filter label=com.docker.compose.project=homeassistant \
-    --format '{{.Names}}|{{.ID}}|{{.Image}}|{{.Status}}' | sort
+  local id
+  while read -r id; do
+    [[ -z "${id}" ]] && continue
+    docker inspect --format \
+      '{{.Name}}|{{.Id}}|{{.Image}}|{{.State.Status}}|{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' \
+      "${id}"
+  done < <(docker ps -aq --filter label=com.docker.compose.project=homeassistant) | sort
 }
 
 wait_for_health() {
@@ -45,12 +50,12 @@ wait_for_health() {
 }
 
 verify_existing_unchanged() {
-  grep -v '^haier-control|' "${INVENTORY_BEFORE}" >"${INVENTORY_BEFORE}.existing"
-  grep -v '^haier-control|' "${INVENTORY_AFTER}" >"${INVENTORY_AFTER}.existing"
+  grep -v '^/haier-control|' "${INVENTORY_BEFORE}" >"${INVENTORY_BEFORE}.existing"
+  grep -v '^/haier-control|' "${INVENTORY_AFTER}" >"${INVENTORY_AFTER}.existing"
   diff -u "${INVENTORY_BEFORE}.existing" "${INVENTORY_AFTER}.existing" >/dev/null
-  while IFS='|' read -r name _id _image status; do
+  while IFS='|' read -r name _id _image status health; do
     [[ -z "${name}" ]] && continue
-    if [[ "${status}" != Up* ]]; then
+    if [[ "${status}" != "running" || "${health}" == "unhealthy" ]]; then
       echo "Existing service is not running after deployment: ${name}" >&2
       return 1
     fi
@@ -85,6 +90,25 @@ if ! grep -q '^  haier-control:$' "${COMPOSE_FILE}"; then
 fi
 if ! grep -q 'network_mode: bridge' "${COMPOSE_FILE}"; then
   echo "Unexpected network mode for haier-control." >&2
+  exit 1
+fi
+if ! docker ps -a --format '{{.Names}}' | grep -qx "${SERVICE}" \
+  && ss -H -ltn 'sport = :8787' | grep -q .; then
+  echo "TCP port 8787 is already in use." >&2
+  exit 1
+fi
+
+# Parse the expanded model internally and emit no configuration or secret values.
+if ! compose config --format json | python3 -c '
+import json, sys
+service = json.load(sys.stdin).get("services", {}).get("haier-control", {})
+assert service.get("container_name") == "haier-control"
+assert service.get("network_mode") == "bridge"
+mounts = service.get("volumes", [])
+assert any(item.get("target") == "/data" for item in mounts if isinstance(item, dict))
+assert any(item.get("target") == "/run/secrets/haier_control_master_key" for item in mounts if isinstance(item, dict))
+'; then
+  echo "Compose service shape failed the safe preflight." >&2
   exit 1
 fi
 
