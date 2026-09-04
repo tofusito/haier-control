@@ -98,9 +98,11 @@ async def test_list_devices_reads_capabilities_from_set_parameters(
     """Reproduces the real symptom on a live account with two working AC units
     (AS25/AS35): once discovery was fixed, both devices showed live state but
     capabilities.modes/fan_modes came back empty. The command-schema response
-    names the group "setParameters", not "parameters" (that name is used
-    elsewhere, for the outgoing command body and the context state shadow) --
-    confirmed live via the safe payload_keys/settings_command_keys diagnostic.
+    nests the enum/range descriptors two levels down --
+    settings.setParameters.parameters -- not directly under "settings" or
+    under a top-level "parameters" (that name is used elsewhere, for the
+    outgoing command body and the context state shadow). Confirmed live via
+    the safe payload_keys/settings_command_keys/settings_keys diagnostics.
     """
 
     def handler(request: httpx.Request) -> httpx.Response:
@@ -131,8 +133,12 @@ async def test_list_devices_reads_capabilities_from_set_parameters(
                     "resultCode": "0",
                     "settings": {
                         "setParameters": {
-                            "machMode": {"enumValues": "0|1|4"},
-                            "tempSel": {"minimumValue": 16, "maximumValue": 32},
+                            "parameters": {
+                                "machMode": {"enumValues": "0|1|4"},
+                                "tempSel": {"minimumValue": 16, "maximumValue": 32},
+                            },
+                            "ancillaryParameters": {},
+                            "protocolType": "1",
                         }
                     },
                 }

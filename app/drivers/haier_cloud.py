@@ -335,10 +335,13 @@ class HaierCloudDriver:
         command = device.commands.get("settings")
         if not isinstance(command, dict):
             return {}
-        # The command-schema response names this group "setParameters" (confirmed
-        # live); unrelated to the "parameters" key used elsewhere for the outgoing
-        # command body and the /commands/v1/context state shadow.
-        params = command.get("setParameters")
+        # The command-schema response nests the enum/range descriptors two levels
+        # down (confirmed live): settings.setParameters.parameters. setParameters
+        # also carries ancillaryParameters/description/protocolType siblings.
+        set_parameters = command.get("setParameters")
+        if not isinstance(set_parameters, dict):
+            return {}
+        params = set_parameters.get("parameters")
         return params if isinstance(params, dict) else {}
 
     async def get_state(self, device_id: str) -> DeviceState:
