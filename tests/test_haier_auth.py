@@ -12,6 +12,8 @@ from app.drivers.haier_auth import (
     HaierProtocolError,
     InteractiveHaierLogin,
     _aura_redirect,
+    _is_progressive_otp,
+    _progressive_navigation_target,
 )
 from app.main import _setup_failure
 
@@ -82,3 +84,36 @@ def test_aura_redirect_reports_a_safe_shape_for_success_without_redirect() -> No
     message = str(excinfo.value)
     assert "action_state': 'SUCCESS'" in message
     assert "event_count': None" in message
+
+
+def test_progressive_login_is_recognised_as_email_otp() -> None:
+    page = (
+        "<html>ProgressiveLoginController verifyEmailOTP "
+        "<input name='emailcode' type='text'></html>"
+    )
+
+    assert _is_progressive_otp(page) is True
+
+
+def test_progressive_login_without_otp_markers_falls_back_to_its_own_link() -> None:
+    """Reproduces the real symptom: Salesforce sends a real, correct login to a
+    ProgressiveLogin page that is NOT an OTP challenge (no 2FA on the account).
+    The old code treated every ProgressiveLogin redirect as OTP and hard-failed
+    here instead of following this page's own next-hop link, like addhOn does.
+    """
+    page = '<html><body>one moment <a href="/finaltok?x=1">continue</a></body></html>'
+
+    assert _is_progressive_otp(page) is False
+    assert _progressive_navigation_target(page) == "/finaltok?x=1"
+
+
+def test_progressive_navigation_target_accepts_an_empty_href() -> None:
+    page = '<a href="">continue</a>'
+
+    assert _progressive_navigation_target(page) == ""
+
+
+def test_progressive_navigation_target_is_none_without_any_link() -> None:
+    page = "<html><body>no link here</body></html>"
+
+    assert _progressive_navigation_target(page) is None

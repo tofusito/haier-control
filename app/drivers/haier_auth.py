@@ -84,9 +84,31 @@ def _remote_descriptor(page: str, method: str) -> dict[str, Any]:
     }
 
 
-def _parse_mfa_context(page: str, page_url: str) -> MfaContext:
+def _is_progressive_otp(page: str) -> bool:
+    """True if a Salesforce ProgressiveLogin page is really the email-OTP step.
+
+    A ProgressiveLogin redirect is not always 2FA (spec: HHT interop with addhOn):
+    it can also be a plain intermediate step with no challenge at all. Callers must
+    check this BEFORE treating the page as OTP, and otherwise fall back to
+    `_progressive_navigation_target` to follow its own next-hop link.
+    """
     lowered = page.lower()
-    if not all(marker in lowered for marker in ("progressivelogincontroller", "verifyemailotp")):
+    return all(marker in lowered for marker in ("progressivelogincontroller", "verifyemailotp"))
+
+
+def _progressive_navigation_target(page: str) -> str | None:
+    """Next-hop href on a non-OTP ProgressiveLogin page, or None if it has none.
+
+    Permissive (unlike `_first_navigation_target`): an empty href="" is a valid
+    match here, mirroring the documented interop behaviour -- only the absence of
+    any url/href attribute at all means there is no next step.
+    """
+    match = re.search(r"(?:url|href)\s*=\s*['\"](.*?)['\"]", page)
+    return match.group(1) if match else None
+
+
+def _parse_mfa_context(page: str, page_url: str) -> MfaContext:
+    if not _is_progressive_otp(page):
         raise HaierAuthenticationError("Progressive login page is not an email OTP challenge")
     if not re.search(r"name\s*=\s*['\"]emailcode['\"]", page, re.I):
         raise HaierAuthenticationError("OTP input was not found")
@@ -331,9 +353,13 @@ class HaierAuthenticator:
             handoff.raise_for_status()
             href = _first_navigation_target(handoff.text)
             if href and "ProgressiveLogin" in href:
-                raise HaierMfaRequired(
-                    "Email two-factor authentication is detected but not implemented in v0.1"
-                )
+                progressive = await client.get(_safe_auth_url(href))
+                progressive.raise_for_status()
+                if _is_progressive_otp(progressive.text):
+                    raise HaierMfaRequired(
+                        "Email two-factor authentication is detected but not implemented in v0.1"
+                    )
+                href = _progressive_navigation_target(progressive.text)
             if not href:
                 raise HaierAuthenticationError("OAuth handoff did not include a token page")
             token_page = await client.get(_safe_auth_url(href))
@@ -454,9 +480,11 @@ class InteractiveHaierLogin:
         if href and "ProgressiveLogin" in href:
             progressive = await self.client.get(_safe_auth_url(href))
             progressive.raise_for_status()
-            self.context = _parse_mfa_context(progressive.text, str(progressive.url))
-            await self.resend_code()
-            return None
+            if _is_progressive_otp(progressive.text):
+                self.context = _parse_mfa_context(progressive.text, str(progressive.url))
+                await self.resend_code()
+                return None
+            href = _progressive_navigation_target(progressive.text)
         if not href:
             raise HaierAuthenticationError("OAuth handoff did not include a token page")
         token_page = await self.client.get(_safe_auth_url(href))
