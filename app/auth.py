@@ -9,6 +9,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from app.database import Database
 from app.rate_limit import RateLimiter
 from app.security import token_hash
+from app.trusted_access import is_trusted_client, session_cookie_valid, trusted_client_digest
 
 bearer = HTTPBearer(auto_error=False)
 
@@ -17,21 +18,33 @@ bearer = HTTPBearer(auto_error=False)
 class Principal:
     digest: str
     scopes: set[str]
+    trusted_network: bool = False
 
 
 async def principal(
     request: Request,
     credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer)],
 ) -> Principal:
-    if not credentials or credentials.scheme.lower() != "bearer":
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Bearer token required")
-    master_key: bytes = request.app.state.master_key
-    database: Database = request.app.state.database
-    digest = token_hash(credentials.credentials, master_key)
-    scopes = await database.authenticate_token(digest)
-    if scopes is None:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid or revoked token")
-    return Principal(digest=digest, scopes=scopes)
+    if credentials:
+        if credentials.scheme.lower() != "bearer":
+            raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Bearer token required")
+        master_key: bytes = request.app.state.master_key
+        database: Database = request.app.state.database
+        digest = token_hash(credentials.credentials, master_key)
+        scopes = await database.authenticate_token(digest)
+        if scopes is None:
+            raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid or revoked token")
+        return Principal(digest=digest, scopes=scopes)
+    if is_trusted_client(request) and session_cookie_valid(request):
+        return Principal(
+            digest=trusted_client_digest(request),
+            scopes={"read", "control", "timers"},
+            trusted_network=True,
+        )
+    raise HTTPException(
+        status.HTTP_401_UNAUTHORIZED,
+        "Bearer token or trusted home session required",
+    )
 
 
 def require_scope(scope: str, *, limit: int) -> object:

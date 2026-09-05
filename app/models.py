@@ -150,6 +150,7 @@ class HealthResponse(BaseModel):
     database: Literal["ok", "error"]
     scheduler: Literal["ok", "error"]
     setup_required: bool = False
+    trusted_network: bool = False
 
 
 class HaierSetupStart(BaseModel):

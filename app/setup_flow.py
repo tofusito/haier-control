@@ -147,7 +147,7 @@ class SetupFlowManager:
     def set_automatic_failure(self, detail: str) -> None:
         self._automatic_failure = detail
 
-    def automatic_status(self) -> HaierSetupStatusResponse:
+    def automatic_status(self, *, expose_api_token: bool = True) -> HaierSetupStatusResponse:
         if self._automatic_flow_id:
             flow = self._flows.get(self._automatic_flow_id)
             if flow and time.monotonic() < flow.expires_at:
@@ -165,7 +165,7 @@ class SetupFlowManager:
                 message=self._automatic_failure,
             )
         if not self.setup_required:
-            token = self._pending_api_token
+            token = self._pending_api_token if expose_api_token else None
             return HaierSetupStatusResponse(
                 status="complete",
                 api_token=token,
@@ -179,6 +179,10 @@ class SetupFlowManager:
         ):
             self._delivery_path.unlink(missing_ok=True)
             self._pending_api_token = None
+
+    def acknowledge_trusted_browser(self) -> None:
+        self._delivery_path.unlink(missing_ok=True)
+        self._pending_api_token = None
 
     async def submit_otp(self, flow_id: str, csrf_token: str, code: str) -> HaierSetupResponse:
         flow = await self._flow(flow_id, csrf_token)

@@ -4,8 +4,8 @@
 
 The default bind address is loopback. A homelab deployment may bind one selected LAN
 address and port, but must not publish or tunnel it to the internet. Health and initial
-setup routes are public; device, command and timer routes require authentication.
-The HTML shell is public but contains no device data.
+setup routes are public in the default protected mode; device, command and timer routes
+require a bearer token. The HTML shell is public but contains no device data.
 
 HTTP does not encrypt hOn credentials or local API tokens. The web pairing flow is an
 explicit convenience for a trusted LAN; CLI bootstrap or local HTTPS is safer.
@@ -50,6 +50,27 @@ an authenticated acknowledgment using that token; acknowledgment deletes the enc
 delivery copy. Until acknowledgment, trusted-LAN clients can obtain this initial token
 through the setup route. Existing token hashes and browser tokens are unchanged on upgrade.
 Clearing browser storage or using another browser still requires a local API token.
+
+### Trusted home-network mode
+
+`HAIER_TRUSTED_NETWORK_MODE=true` is an explicit convenience switch for a private home
+deployment. `HAIER_TRUSTED_NETWORK_CIDRS` must list every allowed source network, normally
+the home Wi-Fi CIDR plus the Tailscale IPv4/IPv6 ranges used by the household. Empty or
+invalid configuration fails closed at startup. The server never trusts `X-Forwarded-For`
+or another proxy header; it checks the direct TCP peer address because the shipped Uvicorn
+configuration has proxy headers disabled.
+
+When enabled, `/` sets a short-lived signed `HttpOnly` cookie only for an allowed source.
+The browser uses that cookie for the dashboard API; it never sees hOn credentials, the
+master key, or a bearer API token. The root dashboard and hOn credential/OTP routes reject
+untrusted sources. Existing bearer tokens continue to work for integrations, including
+from a different network, while the trusted cookie grants only the normal `read`,
+`control`, and `timers` scopes. Keep the service off public reverse proxies and tunnels;
+if a proxy must exist, keep it outside the trusted CIDRs or retain protected mode.
+
+For root-owned DockerHand Compose files, the opt-in can be stored as the `0600` marker
+`/data/haier-trusted-network.conf` with `mode=trusted` and a comma-separated `cidrs=`
+line. It contains no secret and can be removed to restore bearer-token browser access.
 
 ## Threat model
 

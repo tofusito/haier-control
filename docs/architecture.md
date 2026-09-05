@@ -30,6 +30,12 @@ State and command execution still use the cloud; a cached inventory is not offli
 acknowledges it after saving to localStorage. Routine status reads and container restarts
 cannot consume this delivery. Existing SQLite token hashes remain compatible.
 
+An explicit trusted home-network deployment can instead issue a signed `HttpOnly` browser
+session cookie after checking the direct TCP peer against configured Wi-Fi/Tailscale CIDRs.
+The cookie grants the normal local scopes without exposing an API token, hOn credentials,
+or the master key to JavaScript. Bearer tokens remain supported for integrations; proxy
+headers are never used to decide trust.
+
 ## UI consistency and latency
 
 The web client applies each control locally before waiting for hOn: power, temperature,

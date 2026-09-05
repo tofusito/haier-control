@@ -19,6 +19,10 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     poll_interval_seconds: int = Field(default=30, ge=10, le=600)
     command_dedupe_seconds: int = Field(default=3, ge=1, le=30)
+    trusted_network_mode: bool = False
+    trusted_network_cidrs: str = ""
+    trusted_network_config_file: Path = Path("/data/haier-trusted-network.conf")
+    trusted_session_ttl_seconds: int = Field(default=2_592_000, ge=300, le=31_536_000)
     haier_client_id: str = (
         "3MVG9QDx8IX8nP5T2Ha8ofvlmjLZl5L_gvfbT9."
         "HJvpHGKoAS_dcMN8LYpTSYeVFCraUnV.2Ag1Ki7m4znVO6"

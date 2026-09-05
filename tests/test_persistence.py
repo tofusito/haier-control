@@ -145,6 +145,7 @@ async def test_browser_token_survives_reads_restart_until_correct_ack(tmp_path: 
     token = flow.automatic_status().api_token
     assert token
     assert flow.automatic_status().api_token == token
+    assert flow.automatic_status(expose_api_token=False).api_token is None
     restarted = SetupFlowManager(
         fake_driver,
         flow.database,

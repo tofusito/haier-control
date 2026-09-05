@@ -10,6 +10,10 @@ services:
     environment:
       HAIER_DRIVER: ${HAIER_DRIVER:-mock}
       HAIER_LOG_LEVEL: ${HAIER_LOG_LEVEL:-INFO}
+      # Trusted home mode is opt-in. It removes per-browser API-token prompts only
+      # for the explicitly listed Wi-Fi/Tailscale source networks.
+      HAIER_TRUSTED_NETWORK_MODE: ${HAIER_TRUSTED_NETWORK_MODE:-false}
+      HAIER_TRUSTED_NETWORK_CIDRS: ${HAIER_TRUSTED_NETWORK_CIDRS:-}
       # Convenience mode (opt-in): uncomment both. These values are visible to
       # Docker inspect, Compose UIs, and host administrators.
       # HAIER_HON_EMAIL: ${HAIER_HON_EMAIL}

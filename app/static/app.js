@@ -1,5 +1,6 @@
 const state = {
   token: sessionStorage.getItem("haierToken") || localStorage.getItem("haierToken") || "",
+  trustedNetwork: false,
   devices: [], timers: [], eventAbort: null, setupFlow: null,
   selectedDeviceId: localStorage.getItem("haierSelectedDevice") || "",
   pendingCommands: new Set(), optimisticSnapshots: new Map(), acceptedCommands: new Map(), refreshPromise: null,
@@ -17,8 +18,8 @@ const labels = { auto:"Auto", cool:"Frío", heat:"Calor", dry:"Seco", fan:"Venti
 
 async function api(path, options = {}) {
   const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
-  if (state.token) headers.Authorization = `Bearer ${state.token}`;
-  const response = await fetch(path, { ...options, headers });
+  if (state.token && !state.trustedNetwork) headers.Authorization = `Bearer ${state.token}`;
+  const response = await fetch(path, { ...options, headers, credentials: "same-origin" });
   if (response.status === 401) { openTokenDialog("El token no es válido o ha sido revocado."); throw new Error("unauthorized"); }
   let body = null;
   if (response.headers.get("content-type")?.includes("json")) body = await response.json();
@@ -280,9 +281,9 @@ async function saveHaierSetup(event) {
     }
     if (result.status === "complete") {
       state.setupFlow = null;
-      if (result.api_token) { await rememberSetupToken(result.api_token); }
+      if (result.api_token && !state.trustedNetwork) { await rememberSetupToken(result.api_token); }
       $("#haierSetupDialog").close(); toast("hOn conectado");
-      if (state.token) { await refresh(); connectEvents(); } else openTokenDialog("Conexión hOn completada; introduce tu token local.");
+      if (state.token || state.trustedNetwork) { await refresh(); connectEvents(); } else openTokenDialog("Conexión hOn completada; introduce tu token local.");
     }
   } catch (error) { $("#haierPassword").value = ""; errorNode.textContent = error.message; }
 }
@@ -316,7 +317,8 @@ function setConnection(ok, label) { const button=$("#connectionButton"); button.
 async function connectEvents() {
   state.eventAbort?.abort(); const controller = new AbortController(); state.eventAbort = controller;
   try {
-    const response = await fetch("/api/v1/events", { headers:{Authorization:`Bearer ${state.token}`}, signal:controller.signal });
+    const headers = state.token && !state.trustedNetwork ? { Authorization:`Bearer ${state.token}` } : {};
+    const response = await fetch("/api/v1/events", { headers, credentials:"same-origin", signal:controller.signal });
     if (!response.ok || !response.body) return;
     const reader=response.body.getReader(), decoder=new TextDecoder(); let buffer="";
     while (true) {
@@ -339,8 +341,10 @@ $("#connectionButton").addEventListener("click", refresh);
 setInterval(() => { $$('[data-countdown]').forEach(node => node.textContent = countdown(node.dataset.countdown)); }, 1000);
 async function boot() {
   try {
+    const health = await fetch("/healthz", { cache:"no-store" }).then(response => response.json());
+    state.trustedNetwork = Boolean(health.trusted_network);
     const setup = await fetch("/api/v1/setup/haier/status", { cache:"no-store" }).then(response => response.json());
-    if (setup.status === "complete" && setup.api_token) {
+    if (setup.status === "complete" && setup.api_token && !state.trustedNetwork) {
       await rememberSetupToken(setup.api_token);
     }
     if (setup.status === "mfa_required") {
@@ -349,16 +353,16 @@ async function boot() {
       $("#setupEyebrow").textContent = "DOBLE FACTOR"; $("#setupTitle").textContent = "Revisa tu correo";
       $("#haierSetupSubmit").textContent = "Verificar y conectar"; $("#haierSetupDialog").showModal(); return;
     }
-    const health = await fetch("/healthz", { cache:"no-store" }).then(response => response.json());
     if (health.setup_required) {
       $("#setupEyebrow").textContent = state.token ? "RECONECTAR" : "CONFIGURACIÓN INICIAL"; $("#setupTitle").textContent = state.token ? "Reconectar con hOn" : "Conectar con hOn";
       if (setup.status === "failed" && setup.message) $("#haierSetupError").textContent = setup.message;
       $("#haierSetupDialog").showModal(); return;
     }
   } catch (_) { setConnection(false, "Sin conexión"); }
-  if (state.token) { refresh(); connectEvents(); } else openTokenDialog();
+  if (state.token || state.trustedNetwork) { refresh(); connectEvents(); } else openTokenDialog();
 }
 async function rememberSetupToken(token) {
+  if (state.trustedNetwork) return;
   localStorage.setItem("haierToken", token);
   sessionStorage.removeItem("haierToken");
   state.token = token;

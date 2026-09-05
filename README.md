@@ -88,6 +88,35 @@ The first browser token is remembered automatically in localStorage and is only 
 delivered after browser acknowledgment. Existing local tokens remain valid on upgrade.
 The cloud is still required for live state and control.
 
+### Trusted home-network browser access (optional)
+
+For a household deployment reachable only through the home Wi-Fi and Tailscale, enable
+the explicit trusted-network mode and list the source networks:
+
+```yaml
+environment:
+  HAIER_TRUSTED_NETWORK_MODE: "true"
+  HAIER_TRUSTED_NETWORK_CIDRS: "<home-cidr>,100.64.0.0/10,<tailnet-ipv6-cidr>"
+```
+
+The dashboard then receives a signed, `HttpOnly` browser session cookie on the trusted
+network. No hOn credential, master key, or local API token is placed in the page, and a
+new browser opens the dashboard without a token prompt. Bearer API tokens remain available
+for integrations. The root dashboard and hOn setup flow reject clients outside the listed
+networks; do not enable this mode behind a public reverse proxy or internet tunnel.
+
+If DockerHand owns a root-only Compose file, the same setting can be persisted in the
+dedicated `/data/haier-trusted-network.conf` file (mode `0600`):
+
+```text
+mode=trusted
+cidrs=<home-cidr>,100.64.0.0/10,<tailnet-ipv6-cidr>
+```
+
+The marker is deployment-local configuration, contains no secret, and is ignored when
+the corresponding environment settings were explicitly supplied. Remove it to return to
+Bearer-token browser authentication.
+
 Recommended file mode:
 
 ```yaml

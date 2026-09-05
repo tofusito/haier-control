@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Annotated, Any, cast
 
 import httpx
-from fastapi import FastAPI, Header, HTTPException, Query, Request, status
+from fastapi import FastAPI, Header, HTTPException, Query, Request, Response, status
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -48,10 +48,17 @@ from app.models import (
     TokenBootstrapResponse,
 )
 from app.rate_limit import RateLimiter
+from app.runtime_config import load_runtime_config
 from app.scheduler import TimerScheduler
 from app.security import new_api_token, secret_matches, token_hash
 from app.settings import Settings, load_secret
 from app.setup_flow import SetupFlowManager
+from app.trusted_access import (
+    is_trusted_client,
+    issue_session_cookie,
+    require_trusted_network,
+    validate_configuration,
+)
 
 STATIC_DIR = Path(__file__).parent / "static"
 _LOGGER = logging.getLogger(__name__)
@@ -106,11 +113,12 @@ def create_app(
     bootstrap_secret: bytes | None = None,
     driver: Driver | None = None,
 ) -> FastAPI:
-    config = settings or Settings()
+    config = load_runtime_config(settings or Settings())
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         configure_logging(config.log_level)
+        validate_configuration(config)
         key = master_key or load_secret(config.master_key_file)
         bootstrap = (
             bootstrap_secret
@@ -187,6 +195,8 @@ def create_app(
                     saved.clear()
                 clear_direct_credentials(config)
         setup_manager.ensure_pairing()
+        if config.trusted_network_mode and not setup_manager.setup_required:
+            setup_manager.acknowledge_trusted_browser()
         await scheduler.start()
         yield
         await setup_manager.close()
@@ -197,8 +207,9 @@ def create_app(
         title="Haier Control API",
         version="0.1.0",
         description=(
-            "Local, authenticated API for capability-based Haier AC control and persistent timers. "
-            "The healthcheck is the only unauthenticated API route."
+            "Local API for capability-based Haier AC control and persistent timers. "
+            "Bearer tokens protect the API by default; an explicit trusted home-network "
+            "mode can provide a browser session without exposing secrets to the frontend."
         ),
         docs_url=None,
         redoc_url=None,
@@ -218,8 +229,11 @@ def create_app(
         return response
 
     @app.get("/", include_in_schema=False)
-    async def index() -> FileResponse:
-        return FileResponse(STATIC_DIR / "index.html")
+    async def index(request: Request) -> Response:
+        require_trusted_network(request)
+        response = FileResponse(STATIC_DIR / "index.html")
+        issue_session_cookie(request, response)
+        return response
 
     @app.get("/healthz", response_model=HealthResponse, tags=["system"])
     async def health(request: Request) -> HealthResponse:
@@ -235,6 +249,7 @@ def create_app(
             database="ok" if database_ok else "error",
             scheduler="ok" if scheduler_ok else "error",
             setup_required=setup_manager.setup_required,
+            trusted_network=is_trusted_client(request),
         )
 
     @app.post(
@@ -243,12 +258,17 @@ def create_app(
         tags=["setup"],
     )
     async def start_haier_setup(request: Request, payload: HaierSetupStart) -> HaierSetupResponse:
+        require_trusted_network(request)
         client = request.client.host if request.client else "unknown"
         if not await request.app.state.rate_limiter.allow(f"haier-setup:{client}", 5, 600):
             raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, "Setup rate limit exceeded")
         try:
             manager = cast(SetupFlowManager, request.app.state.setup_manager)
-            return await manager.begin(payload.pairing_token, payload.email, payload.password)
+            result = await manager.begin(payload.pairing_token, payload.email, payload.password)
+            if config.trusted_network_mode and result.status == "complete":
+                manager.acknowledge_trusted_browser()
+                return result.model_copy(update={"api_token": None})
+            return result
         except Exception as exc:
             error_status, detail, category = _setup_failure(exc)
             _LOGGER.warning(
@@ -266,14 +286,17 @@ def create_app(
     )
     async def haier_setup_status(request: Request) -> HaierSetupStatusResponse:
         manager = cast(SetupFlowManager, request.app.state.setup_manager)
-        return manager.automatic_status()
+        return manager.automatic_status(expose_api_token=not config.trusted_network_mode)
 
     @app.post("/api/v1/setup/haier/ack", tags=["setup"])
     async def acknowledge_browser(
         request: Request, identity: Any = require_scope("read", limit=60)
     ) -> dict[str, bool]:
         manager = cast(SetupFlowManager, request.app.state.setup_manager)
-        manager.acknowledge_browser(identity.digest)
+        if identity.trusted_network:
+            manager.acknowledge_trusted_browser()
+        else:
+            manager.acknowledge_browser(identity.digest)
         return {"acknowledged": True}
 
     @app.post(
@@ -282,12 +305,17 @@ def create_app(
         tags=["setup"],
     )
     async def submit_haier_otp(request: Request, payload: HaierSetupOtp) -> HaierSetupResponse:
+        require_trusted_network(request)
         client = request.client.host if request.client else "unknown"
         if not await request.app.state.rate_limiter.allow(f"haier-otp:{client}", 8, 600):
             raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, "OTP rate limit exceeded")
         try:
             manager = cast(SetupFlowManager, request.app.state.setup_manager)
-            return await manager.submit_otp(payload.flow_id, payload.csrf_token, payload.code)
+            result = await manager.submit_otp(payload.flow_id, payload.csrf_token, payload.code)
+            if config.trusted_network_mode and result.status == "complete":
+                manager.acknowledge_trusted_browser()
+                return result.model_copy(update={"api_token": None})
+            return result
         except Exception as exc:
             raise HTTPException(
                 status.HTTP_400_BAD_REQUEST,
@@ -300,6 +328,7 @@ def create_app(
         tags=["setup"],
     )
     async def resend_haier_otp(request: Request, payload: HaierSetupResend) -> None:
+        require_trusted_network(request)
         client = request.client.host if request.client else "unknown"
         if not await request.app.state.rate_limiter.allow(f"haier-resend:{client}", 3, 600):
             raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, "Resend rate limit exceeded")

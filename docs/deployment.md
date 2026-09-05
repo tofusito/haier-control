@@ -15,6 +15,16 @@ The application image is built as `haier-control:<12-char-git-sha>`. The Compose
 uses the fixed local alias `haier-control:deployed`; the deployment script moves that
 alias only after a successful build and retains the revision tag. It never uses `latest`.
 
+For a private household dashboard, set `HAIER_TRUSTED_NETWORK_MODE=true` and provide an
+explicit comma-separated `HAIER_TRUSTED_NETWORK_CIDRS` value containing the home Wi-Fi and
+Tailscale ranges. The browser gets a signed `HttpOnly` session cookie without receiving an
+API token; bearer tokens remain available to integrations. The service must stay bound to
+the selected home/Tailscale reachability and must not be placed behind a public proxy or
+tunnel. If DockerHand owns a root-only Compose file, persist the opt-in in
+`/data/haier-trusted-network.conf` (mode `0600`) with `mode=trusted` and `cidrs=...`.
+The application validates this marker before starting and fails closed on missing or
+invalid networks.
+
 ## Safe update script
 
 Run `scripts/deploy-homelab.sh <absolute-stack-directory>` from the server checkout. The
