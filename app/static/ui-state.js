@@ -48,6 +48,14 @@
     };
   }
 
+  // The single place that decides whether this browser still needs a local API
+  // token. Both the boot path and every refresh ask here: when the rule lived in
+  // two places, trusted-network mode booted correctly and was then immediately
+  // sent back to the token dialog by the copy that had not been updated.
+  function needsLocalToken(session) {
+    return !(session && (session.token || session.trustedNetwork));
+  }
+
   function mergeTimerMutations(remoteTimers, mutations) {
     const merged = new Map((remoteTimers || []).map(timer => [timer.id, timer]));
     const remoteByKey = new Map((remoteTimers || []).map(timer => [timer.idempotency_key, timer.id]));
@@ -167,8 +175,8 @@
       return state.devices;
     }
 
-    return { send, reconcileDevices, commandMatches, applyOptimisticState, presentPowerState, mergeTimerMutations };
+    return { send, reconcileDevices, commandMatches, applyOptimisticState, presentPowerState, mergeTimerMutations, needsLocalToken };
   }
 
-  return { createCommandController, applyOptimisticState, commandMatches, presentPowerState, mergeTimerMutations };
+  return { createCommandController, applyOptimisticState, commandMatches, presentPowerState, mergeTimerMutations, needsLocalToken };
 }));

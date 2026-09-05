@@ -4,6 +4,7 @@ const assert = require("node:assert/strict");
 const {
   createCommandController,
   mergeTimerMutations,
+  needsLocalToken,
   presentPowerState,
 } = require("../app/static/ui-state.js");
 
@@ -216,4 +217,15 @@ test("a server timer with the same idempotency key does not duplicate the optimi
   const remote = { ...optimistic, id: "server-1", updated_at: "2026-09-05T00:30:01Z" };
   const merged = mergeTimerMutations([remote], new Map([[optimistic.id, { optimistic }]]));
   assert.deepEqual(merged.map(timer => timer.id), ["pending-1"]);
+});
+
+
+test("a trusted-network browser is never asked for a local API token", () => {
+  // Regression: trusted mode booted correctly and was then sent straight back
+  // to the token dialog, because the refresh path still gated on the token
+  // alone. Both entry points now ask this one function.
+  assert.equal(needsLocalToken({ token: "", trustedNetwork: true }), false);
+  assert.equal(needsLocalToken({ token: "hc_example", trustedNetwork: false }), false);
+  assert.equal(needsLocalToken({ token: "", trustedNetwork: false }), true);
+  assert.equal(needsLocalToken(undefined), true);
 });

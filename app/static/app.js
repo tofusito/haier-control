@@ -283,7 +283,8 @@ async function saveHaierSetup(event) {
       state.setupFlow = null;
       if (result.api_token && !state.trustedNetwork) { await rememberSetupToken(result.api_token); }
       $("#haierSetupDialog").close(); toast("hOn conectado");
-      if (state.token || state.trustedNetwork) { await refresh(); connectEvents(); } else openTokenDialog("Conexión hOn completada; introduce tu token local.");
+      if (window.HaierUiState.needsLocalToken(state)) openTokenDialog("Conexión hOn completada; introduce tu token local.");
+      else { await refresh(); connectEvents(); }
     }
   } catch (error) { $("#haierPassword").value = ""; errorNode.textContent = error.message; }
 }
@@ -295,7 +296,7 @@ async function resendOtp() {
 }
 
 async function refresh() {
-  if (!state.token) { openTokenDialog(); return; }
+  if (window.HaierUiState.needsLocalToken(state)) { openTokenDialog(); return; }
   if (state.refreshPromise) return state.refreshPromise;
   state.refreshPromise = (async () => {
     try {
@@ -359,7 +360,7 @@ async function boot() {
       $("#haierSetupDialog").showModal(); return;
     }
   } catch (_) { setConnection(false, "Sin conexión"); }
-  if (state.token || state.trustedNetwork) { refresh(); connectEvents(); } else openTokenDialog();
+  if (window.HaierUiState.needsLocalToken(state)) openTokenDialog(); else { refresh(); connectEvents(); }
 }
 async function rememberSetupToken(token) {
   if (state.trustedNetwork) return;
