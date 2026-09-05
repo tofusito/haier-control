@@ -3,6 +3,7 @@ const assert = require("node:assert/strict");
 
 const {
   createCommandController,
+  decideBootAction,
   mergeTimerMutations,
   needsLocalToken,
   presentPowerState,
@@ -228,4 +229,74 @@ test("a trusted-network browser is never asked for a local API token", () => {
   assert.equal(needsLocalToken({ token: "hc_example", trustedNetwork: false }), false);
   assert.equal(needsLocalToken({ token: "", trustedNetwork: false }), true);
   assert.equal(needsLocalToken(undefined), true);
+});
+
+
+const READY = { setup_required: false, trusted_network: true };
+const COMPLETE = { status: "complete", api_token: null };
+
+test("boot sends a trusted browser straight to the dashboard", () => {
+  const plan = decideBootAction({
+    health: READY,
+    setup: COMPLETE,
+    session: { token: "", trustedNetwork: true },
+  });
+  assert.equal(plan.action, "dashboard");
+  assert.equal(plan.storeToken, null);
+});
+
+test("boot asks an untrusted browser without a token for one", () => {
+  const plan = decideBootAction({
+    health: { setup_required: false, trusted_network: false },
+    setup: COMPLETE,
+    session: { token: "", trustedNetwork: false },
+  });
+  assert.equal(plan.action, "token");
+});
+
+test("boot stores a delivered token and then goes to the dashboard", () => {
+  const plan = decideBootAction({
+    health: { setup_required: false, trusted_network: false },
+    setup: { status: "complete", api_token: "hc_delivered" },
+    session: { token: "", trustedNetwork: false },
+  });
+  assert.equal(plan.storeToken, "hc_delivered");
+  assert.equal(plan.action, "dashboard");
+});
+
+test("boot never hands a token to a trusted browser", () => {
+  const plan = decideBootAction({
+    health: READY,
+    setup: { status: "complete", api_token: "hc_delivered" },
+    session: { token: "", trustedNetwork: true },
+  });
+  assert.equal(plan.storeToken, null);
+  assert.equal(plan.action, "dashboard");
+});
+
+test("boot opens the hOn setup, and calls it a reconnect only when a session exists", () => {
+  const fresh = decideBootAction({
+    health: { setup_required: true },
+    setup: { status: "manual" },
+    session: { token: "", trustedNetwork: true },
+  });
+  const again = decideBootAction({
+    health: { setup_required: true },
+    setup: { status: "failed", message: "hOn rechazó el acceso" },
+    session: { token: "hc_existing", trustedNetwork: false },
+  });
+  assert.equal(fresh.action, "haier-setup");
+  assert.equal(fresh.reconnect, false);
+  assert.equal(again.reconnect, true);
+  assert.equal(again.message, "hOn rechazó el acceso");
+});
+
+test("boot carries the OTP challenge through to the dialog", () => {
+  const plan = decideBootAction({
+    health: { setup_required: true },
+    setup: { status: "mfa_required", flow_id: "flow-1", csrf_token: "csrf-1" },
+    session: { token: "", trustedNetwork: true },
+  });
+  assert.equal(plan.action, "otp");
+  assert.deepEqual(plan.flow, { id: "flow-1", csrf: "csrf-1" });
 });

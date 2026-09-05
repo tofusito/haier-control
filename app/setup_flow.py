@@ -44,6 +44,7 @@ class SetupFlowManager:
         pairing_ttl: int = 600,
         flow_ttl: int = 600,
         session_factory: Callable[[], InteractiveHaierLogin] | None = None,
+        deliver_browser_token: bool = True,
     ) -> None:
         self.driver = driver
         self.database = database
@@ -58,6 +59,9 @@ class SetupFlowManager:
         self._lock = asyncio.Lock()
         self._automatic_flow_id: str | None = None
         self._automatic_failure: str | None = None
+        # A trusted-network deployment never hands a token to a browser, so minting
+        # one here would only leave an unusable row nobody can ever present.
+        self._deliver_browser_token = deliver_browser_token
         self._pending_api_token: str | None = None
         self._delivery_path: Path = database.path.with_name("browser-setup.enc")
         self._box = SecretBox(master_key)
@@ -216,7 +220,7 @@ class SetupFlowManager:
             raise HaierAuthenticationError("Haier Cloud driver is not enabled")
         self.driver.store_tokens(tokens)
         api_token: str | None = None
-        if await self.database.token_count() == 0:
+        if self._deliver_browser_token and await self.database.token_count() == 0:
             api_token = new_api_token()
             await self.database.create_token(
                 "web-setup",

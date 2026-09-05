@@ -6,6 +6,7 @@ import httpx
 import pytest
 
 from app.main import create_app
+from app.settings import Settings
 from app.trusted_access import TRUSTED_SESSION_COOKIE
 
 
@@ -22,7 +23,7 @@ async def test_health_is_only_public_operational_route(client: httpx.AsyncClient
 
 @pytest.mark.asyncio
 async def test_trusted_network_browser_session_needs_no_bearer_token(
-    settings, master_key: bytes
+    settings: Settings, master_key: bytes
 ) -> None:
     trusted_settings = settings.model_copy(
         update={
@@ -50,7 +51,7 @@ async def test_trusted_network_browser_session_needs_no_bearer_token(
 
 @pytest.mark.asyncio
 async def test_trusted_network_accepts_tailscale_range_but_rejects_other_sources(
-    settings, master_key: bytes
+    settings: Settings, master_key: bytes
 ) -> None:
     trusted_settings = settings.model_copy(
         update={
@@ -84,7 +85,7 @@ async def test_trusted_network_accepts_tailscale_range_but_rejects_other_sources
 
 @pytest.mark.asyncio
 async def test_trusted_mode_requires_explicit_network_configuration(
-    settings, master_key: bytes
+    settings: Settings, master_key: bytes
 ) -> None:
     trusted_settings = settings.model_copy(update={"trusted_network_mode": True})
     app = create_app(trusted_settings, master_key=master_key)
@@ -193,7 +194,7 @@ async def test_openapi_requires_read_scope(
 
 @pytest.mark.asyncio
 async def test_trusted_network_still_requires_the_signed_session_cookie(
-    settings, master_key: bytes
+    settings: Settings, master_key: bytes
 ) -> None:
     """The trust boundary is two gates, not one.
 
@@ -239,7 +240,9 @@ async def test_trusted_network_still_requires_the_signed_session_cookie(
 
 
 @pytest.mark.asyncio
-async def test_trusted_mode_rejects_a_default_route(settings, master_key: bytes) -> None:
+async def test_trusted_mode_rejects_a_default_route(
+    settings: Settings, master_key: bytes
+) -> None:
     """`0.0.0.0/0` would trust every source that can reach the port."""
     trusted_settings = settings.model_copy(
         update={"trusted_network_mode": True, "trusted_network_cidrs": "192.0.2.0/24,0.0.0.0/0"}

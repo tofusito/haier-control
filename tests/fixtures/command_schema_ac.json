@@ -1,0 +1,6418 @@
+{
+ "authInfo": {
+  "cognitoTokenNew": "REDACTED_SECRET"
+ },
+ "payload": {
+  "applianceModel": {
+   "applianceTypeId": 11,
+   "applianceTypeName": "AC",
+   "attributes": [
+    {
+     "id": 113933,
+     "lastUpdate": "2024-10-30T13:47:15Z",
+     "parName": "windType",
+     "parValue": "vertical|horizontal",
+     "status": 1
+    },
+    {
+     "id": 113934,
+     "lastUpdate": "2024-10-03T09:30:30Z",
+     "parName": "seriesVersion",
+     "parValue": "s",
+     "status": 1
+    },
+    {
+     "id": 113935,
+     "lastUpdate": "2024-10-03T09:30:30Z",
+     "parName": "series",
+     "parValue": "s",
+     "status": 1
+    },
+    {
+     "id": 113936,
+     "lastUpdate": "2024-10-03T09:30:30Z",
+     "parName": "lowerBarrierDate",
+     "parValue": "2434",
+     "status": 1
+    },
+    {
+     "id": 113937,
+     "lastUpdate": "2024-10-03T09:30:30Z",
+     "parName": "installationType",
+     "parValue": "1to1|1to2|1toN",
+     "status": 1
+    },
+    {
+     "id": 113938,
+     "lastUpdate": "2024-10-03T09:30:30Z",
+     "parName": "type",
+     "parValue": "rac",
+     "status": 1
+    },
+    {
+     "id": 113939,
+     "lastUpdate": "2024-10-03T09:30:30Z",
+     "parName": "serviceability",
+     "parValue": "none",
+     "status": 1
+    },
+    {
+     "id": 113940,
+     "lastUpdate": "2025-04-11T07:43:34Z",
+     "parName": "interfaceType",
+     "parValue": "type|series|seriesVersion|option|windType|installationType",
+     "status": 1
+    },
+    {
+     "id": 113941,
+     "lastUpdate": "2024-10-03T09:30:30Z",
+     "parName": "fwLabel",
+     "parValue": "iotfw_epp",
+     "status": 1
+    },
+    {
+     "id": 121461,
+     "lastUpdate": "2025-01-28T14:23:19Z",
+     "parName": "enrollmentType",
+     "parValue": "3.2",
+     "status": 1
+    },
+    {
+     "id": 169558,
+     "lastUpdate": "2026-03-25T14:18:38Z",
+     "parName": "iot",
+     "parValue": "hOn",
+     "status": 1
+    }
+   ],
+   "brand": "haier",
+   "code": "AACWH0E0000",
+   "connectivity": "wifi|ble",
+   "id": 15253,
+   "name": "AS25SBBHRA-MW",
+   "options": {}
+  },
+  "dictionaryId": 718,
+  "options": {},
+  "resultCode": "0",
+  "settings": {
+   "setParameters": {
+    "ancillaryParameters": {
+     "programRules": {
+      "category": "rule",
+      "fixedValue": {
+       "selfCleaning56Status": {
+        "$installationType": {
+         "1to2": {
+          "fixedValue": "0",
+          "typology": "fixed"
+         },
+         "1toN": {
+          "fixedValue": "0",
+          "typology": "fixed"
+         }
+        }
+       },
+       "selfCleaningStatus": {
+        "$installationType": {
+         "1toN": {
+          "fixedValue": "0",
+          "typology": "fixed"
+         }
+        }
+       }
+      },
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "remoteActionable": {
+      "category": "general",
+      "fixedValue": "1",
+      "mandatory": 0,
+      "typology": "fixed"
+     },
+     "remoteVisible": {
+      "category": "general",
+      "fixedValue": "1",
+      "mandatory": 0,
+      "typology": "fixed"
+     },
+     "windDirectionVerticalPositionSequence": {
+      "category": "general",
+      "enumValues": [
+       1,
+       2,
+       4,
+       5,
+       6,
+       3,
+       8
+      ],
+      "mandatory": 0,
+      "typology": "enum"
+     }
+    },
+    "description": "The message allows to change parameters values to enable/disable specific features ",
+    "parameters": {
+     "10degreeHeatingStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "ch2oCleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "cleaningTimeStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "compressorFrequencyCut": {
+      "category": "command",
+      "defaultValue": "1",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "3",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "dryingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "echoStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "electricHeatingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavePeriod": {
+      "category": "command",
+      "fixedValue": "15",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "filterChangeStatusCloud": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "freshAirStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "halfDegreeSettingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "healthMode": {
+      "category": "command",
+      "defaultValue": "0",
+      "enumValues": [
+       0,
+       1
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "heatAccumulationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humanSensingStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "3",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "humidificationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humiditySel": {
+      "category": "command",
+      "fixedValue": "52",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "intelligenceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lightStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lockStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "machMode": {
+      "category": "command",
+      "defaultValue": "0",
+      "enumValues": [
+       0,
+       1,
+       2,
+       4,
+       6
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "manualDefrostingStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "mouldProofStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "muteStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "onOffStatus": {
+      "category": "command",
+      "fixedValue": "1",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "operationName": {
+      "category": "command",
+      "fixedValue": "grSetDAC",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pm2p5CleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pmvStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "preventHeatstrokeStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "rapidMode": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "screenDisplayStatus": {
+      "category": "command",
+      "defaultValue": "1",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaning56Status": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaningStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "silentSleepStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "specialMode": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "tempSel": {
+      "category": "command",
+      "defaultValue": "22",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "30",
+      "minimumValue": "16",
+      "typology": "range"
+     },
+     "tempUnit": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceSignStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windDirectionHorizontal": {
+      "category": "command",
+      "defaultValue": "0",
+      "enumValues": [
+       0,
+       3,
+       4,
+       5,
+       6,
+       7
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windDirectionVertical": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       8
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windSensingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windSpeed": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       5
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     }
+    },
+    "protocolType": "MQTT"
+   }
+  },
+  "startProgram": {
+   "PROGRAMS.AC.IOT_10_HEATING": {
+    "ancillaryParameters": {
+     "programFamily": {
+      "category": "cluster",
+      "defaultValue": "[dashboard|standard]",
+      "enumValues": [
+       "dashboard",
+       "standard"
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "remoteActionable": {
+      "category": "general",
+      "fixedValue": "1",
+      "mandatory": 0,
+      "typology": "fixed"
+     },
+     "remoteVisible": {
+      "category": "general",
+      "fixedValue": "1",
+      "mandatory": 0,
+      "typology": "fixed"
+     },
+     "windDirectionVerticalPositionSequence": {
+      "category": "general",
+      "enumValues": [
+       1,
+       2,
+       4,
+       5,
+       6,
+       7,
+       3,
+       8
+      ],
+      "mandatory": 0,
+      "typology": "enum"
+     }
+    },
+    "description": "The 10°C Heating function helps your appliance maintain a minimum temperature in your home, avoiding any thermal shocks.",
+    "parameters": {
+     "10degreeHeatingStatus": {
+      "category": "command",
+      "fixedValue": "1",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "ch2oCleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "cleaningTimeStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "compressorFrequencyCut": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "3",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "dryingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "echoStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "electricHeatingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavePeriod": {
+      "category": "command",
+      "fixedValue": "15",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "filterChangeStatusCloud": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "freshAirStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "halfDegreeSettingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "healthMode": {
+      "category": "command",
+      "defaultValue": "0",
+      "enumValues": [
+       0,
+       1
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "heatAccumulationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humanSensingStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "3",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "humidificationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humiditySel": {
+      "category": "command",
+      "fixedValue": "30",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "intelligenceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lightStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lockStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "machMode": {
+      "category": "command",
+      "fixedValue": "4",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "manualDefrostingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "mouldProofStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "muteStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "onOffStatus": {
+      "category": "command",
+      "fixedValue": "1",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "operationName": {
+      "category": "command",
+      "fixedValue": "grSetDAC",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pm2p5CleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pmvStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "preventHeatstrokeStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "rapidMode": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "screenDisplayStatus": {
+      "category": "command",
+      "defaultValue": "1",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaning56Status": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "silentSleepStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "specialMode": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "tempSel": {
+      "category": "command",
+      "defaultValue": "22",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "30",
+      "minimumValue": "16",
+      "typology": "range"
+     },
+     "tempUnit": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceSignStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windDirectionHorizontal": {
+      "category": "command",
+      "defaultValue": "0",
+      "enumValues": [
+       0,
+       3,
+       4,
+       5,
+       6,
+       7
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windDirectionVertical": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windSensingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windSpeed": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       5
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     }
+    },
+    "protocolType": "MQTT"
+   },
+   "PROGRAMS.AC.IOT_AUTO": {
+    "ancillaryParameters": {
+     "programFamily": {
+      "category": "cluster",
+      "defaultValue": "[dashboard|standard]",
+      "enumValues": [
+       "dashboard",
+       "standard"
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "remoteActionable": {
+      "category": "general",
+      "fixedValue": "1",
+      "mandatory": 0,
+      "typology": "fixed"
+     },
+     "remoteVisible": {
+      "category": "general",
+      "fixedValue": "1",
+      "mandatory": 0,
+      "typology": "fixed"
+     },
+     "windDirectionVerticalPositionSequence": {
+      "category": "general",
+      "enumValues": [
+       1,
+       2,
+       4,
+       5,
+       6,
+       3,
+       8
+      ],
+      "mandatory": 0,
+      "typology": "enum"
+     }
+    },
+    "description": "In Auto mode, the set temperature is 24℃ by default and can be adjusted.",
+    "parameters": {
+     "10degreeHeatingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "ch2oCleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "cleaningTimeStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "compressorFrequencyCut": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "3",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "dryingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "echoStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "electricHeatingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavePeriod": {
+      "category": "command",
+      "fixedValue": "15",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "filterChangeStatusCloud": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "freshAirStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "halfDegreeSettingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "healthMode": {
+      "category": "command",
+      "defaultValue": "0",
+      "enumValues": [
+       0,
+       1
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "heatAccumulationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humanSensingStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "3",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "humidificationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humiditySel": {
+      "category": "command",
+      "fixedValue": "30",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "intelligenceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lightStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lockStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "machMode": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "manualDefrostingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "mouldProofStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "muteStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "onOffStatus": {
+      "category": "command",
+      "fixedValue": "1",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "operationName": {
+      "category": "command",
+      "fixedValue": "grSetDAC",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pm2p5CleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pmvStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "preventHeatstrokeStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "rapidMode": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "screenDisplayStatus": {
+      "category": "command",
+      "defaultValue": "1",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaning56Status": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaningStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "silentSleepStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "specialMode": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "tempSel": {
+      "category": "command",
+      "defaultValue": "24",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "30",
+      "minimumValue": "16",
+      "typology": "range"
+     },
+     "tempUnit": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceSignStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windDirectionHorizontal": {
+      "category": "command",
+      "defaultValue": "0",
+      "enumValues": [
+       0,
+       3,
+       4,
+       5,
+       6,
+       7
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windDirectionVertical": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       8
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windSensingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windSpeed": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       5
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     }
+    },
+    "protocolType": "MQTT"
+   },
+   "PROGRAMS.AC.IOT_COOL": {
+    "ancillaryParameters": {
+     "ecoMode": {
+      "category": "general",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "programFamily": {
+      "category": "cluster",
+      "defaultValue": "[dashboard|standard]",
+      "enumValues": [
+       "dashboard",
+       "standard"
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "programRules": {
+      "category": "rule",
+      "fixedValue": {
+       "tempSel": {
+        "ecoMode": {
+         "1": {
+          "machMode": {
+           "1": {
+            "fixedValue": "26",
+            "typology": "fixed"
+           },
+           "4": {
+            "fixedValue": "20",
+            "typology": "fixed"
+           }
+          }
+         }
+        }
+       },
+       "windDirectionHorizontal": {
+        "ecoMode": {
+         "1": {
+          "machMode": {
+           "1|4": {
+            "fixedValue": "4",
+            "typology": "fixed"
+           }
+          }
+         }
+        }
+       },
+       "windDirectionVertical": {
+        "ecoMode": {
+         "1": {
+          "machMode": {
+           "1|4": {
+            "fixedValue": "3",
+            "typology": "fixed"
+           }
+          }
+         }
+        }
+       },
+       "windSpeed": {
+        "ecoMode": {
+         "1": {
+          "machMode": {
+           "1|4": {
+            "defaultValue": "5",
+            "enumValues": "1|2|3|5",
+            "typology": "enum"
+           }
+          }
+         }
+        }
+       }
+      },
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "remoteActionable": {
+      "category": "general",
+      "fixedValue": "1",
+      "mandatory": 0,
+      "typology": "fixed"
+     },
+     "remoteVisible": {
+      "category": "general",
+      "fixedValue": "1",
+      "mandatory": 0,
+      "typology": "fixed"
+     },
+     "windDirectionVerticalPositionSequence": {
+      "category": "general",
+      "enumValues": [
+       1,
+       2,
+       4,
+       5,
+       6,
+       3,
+       8
+      ],
+      "mandatory": 0,
+      "typology": "enum"
+     }
+    },
+    "description": "Cool air conditioning (minimum 16℃) for keeping you cool in hot weather.",
+    "parameters": {
+     "10degreeHeatingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "ch2oCleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "cleaningTimeStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "compressorFrequencyCut": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "3",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "dryingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "echoStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "electricHeatingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavePeriod": {
+      "category": "command",
+      "fixedValue": "15",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "filterChangeStatusCloud": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "freshAirStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "halfDegreeSettingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "healthMode": {
+      "category": "command",
+      "defaultValue": "0",
+      "enumValues": [
+       0,
+       1
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "heatAccumulationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humanSensingStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "3",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "humidificationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humiditySel": {
+      "category": "command",
+      "fixedValue": "30",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "intelligenceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lightStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lockStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "machMode": {
+      "category": "command",
+      "fixedValue": "1",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "manualDefrostingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "mouldProofStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "muteStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "onOffStatus": {
+      "category": "command",
+      "fixedValue": "1",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "operationName": {
+      "category": "command",
+      "fixedValue": "grSetDAC",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pm2p5CleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pmvStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "preventHeatstrokeStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "rapidMode": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "screenDisplayStatus": {
+      "category": "command",
+      "defaultValue": "1",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaning56Status": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaningStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "silentSleepStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "specialMode": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "tempSel": {
+      "category": "command",
+      "defaultValue": "22",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "30",
+      "minimumValue": "16",
+      "typology": "range"
+     },
+     "tempUnit": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceSignStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windDirectionHorizontal": {
+      "category": "command",
+      "defaultValue": "0",
+      "enumValues": [
+       0,
+       3,
+       4,
+       5,
+       6,
+       7
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windDirectionVertical": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       8
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windSensingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windSpeed": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       5
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     }
+    },
+    "protocolType": "MQTT"
+   },
+   "PROGRAMS.AC.IOT_DRY": {
+    "ancillaryParameters": {
+     "programFamily": {
+      "category": "cluster",
+      "defaultValue": "[dashboard|standard]",
+      "enumValues": [
+       "dashboard",
+       "standard"
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "remoteActionable": {
+      "category": "general",
+      "fixedValue": "1",
+      "mandatory": 0,
+      "typology": "fixed"
+     },
+     "remoteVisible": {
+      "category": "general",
+      "fixedValue": "1",
+      "mandatory": 0,
+      "typology": "fixed"
+     },
+     "windDirectionVerticalPositionSequence": {
+      "category": "general",
+      "enumValues": [
+       1,
+       2,
+       4,
+       5,
+       6,
+       3,
+       8
+      ],
+      "mandatory": 0,
+      "typology": "enum"
+     }
+    },
+    "description": "Keep air dry and reduce indoor humidity.",
+    "parameters": {
+     "10degreeHeatingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "ch2oCleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "cleaningTimeStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "compressorFrequencyCut": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "3",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "dryingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "echoStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "electricHeatingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavePeriod": {
+      "category": "command",
+      "fixedValue": "15",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "filterChangeStatusCloud": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "freshAirStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "halfDegreeSettingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "healthMode": {
+      "category": "command",
+      "defaultValue": "0",
+      "enumValues": [
+       0,
+       1
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "heatAccumulationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humanSensingStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "3",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "humidificationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humiditySel": {
+      "category": "command",
+      "defaultValue": "30",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "90",
+      "minimumValue": "30",
+      "typology": "range"
+     },
+     "intelligenceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lightStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lockStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "machMode": {
+      "category": "command",
+      "fixedValue": "2",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "manualDefrostingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "mouldProofStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "muteStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "onOffStatus": {
+      "category": "command",
+      "fixedValue": "1",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "operationName": {
+      "category": "command",
+      "fixedValue": "grSetDAC",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pm2p5CleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pmvStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "preventHeatstrokeStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "rapidMode": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "screenDisplayStatus": {
+      "category": "command",
+      "defaultValue": "1",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaning56Status": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaningStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "silentSleepStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "specialMode": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "tempSel": {
+      "category": "command",
+      "defaultValue": "22",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "30",
+      "minimumValue": "16",
+      "typology": "range"
+     },
+     "tempUnit": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceSignStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windDirectionHorizontal": {
+      "category": "command",
+      "defaultValue": "0",
+      "enumValues": [
+       0,
+       3,
+       4,
+       5,
+       6,
+       7
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windDirectionVertical": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       8
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windSensingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windSpeed": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       5
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     }
+    },
+    "protocolType": "MQTT"
+   },
+   "PROGRAMS.AC.IOT_FAN": {
+    "ancillaryParameters": {
+     "programFamily": {
+      "category": "cluster",
+      "defaultValue": "[dashboard|standard]",
+      "enumValues": [
+       "dashboard",
+       "standard"
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "remoteActionable": {
+      "category": "general",
+      "fixedValue": "1",
+      "mandatory": 0,
+      "typology": "fixed"
+     },
+     "remoteVisible": {
+      "category": "general",
+      "fixedValue": "1",
+      "mandatory": 0,
+      "typology": "fixed"
+     },
+     "windDirectionVerticalPositionSequence": {
+      "category": "general",
+      "enumValues": [
+       1,
+       2,
+       4,
+       5,
+       6,
+       3,
+       8
+      ],
+      "mandatory": 0,
+      "typology": "enum"
+     }
+    },
+    "description": "Ventilate the air without changing the temperature.",
+    "parameters": {
+     "10degreeHeatingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "ch2oCleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "cleaningTimeStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "compressorFrequencyCut": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "dryingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "echoStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "electricHeatingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavePeriod": {
+      "category": "command",
+      "fixedValue": "15",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "filterChangeStatusCloud": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "freshAirStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "halfDegreeSettingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "healthMode": {
+      "category": "command",
+      "defaultValue": "0",
+      "enumValues": [
+       0,
+       1
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "heatAccumulationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humanSensingStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "3",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "humidificationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humiditySel": {
+      "category": "command",
+      "fixedValue": "30",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "intelligenceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lightStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lockStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "machMode": {
+      "category": "command",
+      "fixedValue": "6",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "manualDefrostingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "mouldProofStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "muteStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "onOffStatus": {
+      "category": "command",
+      "fixedValue": "1",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "operationName": {
+      "category": "command",
+      "fixedValue": "grSetDAC",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pm2p5CleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pmvStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "preventHeatstrokeStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "rapidMode": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "screenDisplayStatus": {
+      "category": "command",
+      "defaultValue": "1",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaning56Status": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaningStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "silentSleepStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "specialMode": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "tempSel": {
+      "category": "command",
+      "defaultValue": "22",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "30",
+      "minimumValue": "16",
+      "typology": "range"
+     },
+     "tempUnit": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceSignStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windDirectionHorizontal": {
+      "category": "command",
+      "defaultValue": "0",
+      "enumValues": [
+       0,
+       3,
+       4,
+       5,
+       6,
+       7
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windDirectionVertical": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       8
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windSensingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windSpeed": {
+      "category": "command",
+      "defaultValue": "3",
+      "enumValues": [
+       1,
+       2,
+       3
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     }
+    },
+    "protocolType": "MQTT"
+   },
+   "PROGRAMS.AC.IOT_HEAT": {
+    "ancillaryParameters": {
+     "ecoMode": {
+      "category": "general",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "programFamily": {
+      "category": "cluster",
+      "defaultValue": "[dashboard|standard]",
+      "enumValues": [
+       "dashboard",
+       "standard"
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "programRules": {
+      "category": "rule",
+      "fixedValue": {
+       "tempSel": {
+        "ecoMode": {
+         "1": {
+          "machMode": {
+           "1": {
+            "fixedValue": "26",
+            "typology": "fixed"
+           },
+           "4": {
+            "fixedValue": "20",
+            "typology": "fixed"
+           }
+          }
+         }
+        }
+       },
+       "windDirectionHorizontal": {
+        "ecoMode": {
+         "1": {
+          "machMode": {
+           "1|4": {
+            "fixedValue": "4",
+            "typology": "fixed"
+           }
+          }
+         }
+        }
+       },
+       "windDirectionVertical": {
+        "ecoMode": {
+         "1": {
+          "machMode": {
+           "1|4": {
+            "fixedValue": "3",
+            "typology": "fixed"
+           }
+          }
+         }
+        }
+       },
+       "windSpeed": {
+        "ecoMode": {
+         "1": {
+          "machMode": {
+           "1|4": {
+            "defaultValue": "5",
+            "enumValues": "1|2|3|5",
+            "typology": "enum"
+           }
+          }
+         }
+        }
+       }
+      },
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "remoteActionable": {
+      "category": "general",
+      "fixedValue": "1",
+      "mandatory": 0,
+      "typology": "fixed"
+     },
+     "remoteVisible": {
+      "category": "general",
+      "fixedValue": "1",
+      "mandatory": 0,
+      "typology": "fixed"
+     },
+     "windDirectionVerticalPositionSequence": {
+      "category": "general",
+      "enumValues": [
+       1,
+       2,
+       4,
+       5,
+       6,
+       7,
+       3,
+       8
+      ],
+      "mandatory": 0,
+      "typology": "enum"
+     }
+    },
+    "description": "Warm air conditioning (maximum 30℃) for keeping you warm in cold weather.",
+    "parameters": {
+     "10degreeHeatingStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "ch2oCleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "cleaningTimeStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "compressorFrequencyCut": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "3",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "dryingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "echoStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "electricHeatingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavePeriod": {
+      "category": "command",
+      "fixedValue": "15",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "filterChangeStatusCloud": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "freshAirStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "halfDegreeSettingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "healthMode": {
+      "category": "command",
+      "defaultValue": "0",
+      "enumValues": [
+       0,
+       1
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "heatAccumulationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humanSensingStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "3",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "humidificationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humiditySel": {
+      "category": "command",
+      "fixedValue": "30",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "intelligenceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lightStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lockStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "machMode": {
+      "category": "command",
+      "fixedValue": "4",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "manualDefrostingStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "mouldProofStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "muteStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "onOffStatus": {
+      "category": "command",
+      "fixedValue": "1",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "operationName": {
+      "category": "command",
+      "fixedValue": "grSetDAC",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pm2p5CleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pmvStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "preventHeatstrokeStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "rapidMode": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "screenDisplayStatus": {
+      "category": "command",
+      "defaultValue": "1",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaning56Status": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "silentSleepStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "specialMode": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "tempSel": {
+      "category": "command",
+      "defaultValue": "22",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "30",
+      "minimumValue": "16",
+      "typology": "range"
+     },
+     "tempUnit": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceSignStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windDirectionHorizontal": {
+      "category": "command",
+      "defaultValue": "0",
+      "enumValues": [
+       0,
+       3,
+       4,
+       5,
+       6,
+       7
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windDirectionVertical": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windSensingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windSpeed": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       5
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     }
+    },
+    "protocolType": "MQTT"
+   },
+   "PROGRAMS.AC.IOT_SELF_CLEAN": {
+    "ancillaryParameters": {
+     "programFamily": {
+      "category": "cluster",
+      "defaultValue": "[dashboard|maintenance|health]",
+      "enumValues": [
+       "dashboard",
+       "maintenance",
+       "health"
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "programRules": {
+      "category": "rule",
+      "fixedValue": {
+       "remoteActionable": {
+        "$installationType": {
+         "1toN": {
+          "fixedValue": "0",
+          "typology": "fixed"
+         }
+        }
+       },
+       "remoteVisible": {
+        "$installationType": {
+         "1toN": {
+          "fixedValue": "0",
+          "typology": "fixed"
+         }
+        }
+       }
+      },
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "remoteActionable": {
+      "category": "general",
+      "defaultValue": "1",
+      "incrementValue": "1",
+      "mandatory": 0,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "remoteVisible": {
+      "category": "general",
+      "defaultValue": "1",
+      "incrementValue": "1",
+      "mandatory": 0,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     }
+    },
+    "description": "Automatic cleaning of the air conditioner",
+    "parameters": {
+     "10degreeHeatingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "ch2oCleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "cleaningTimeStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "compressorFrequencyCut": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "dryingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "echoStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "electricHeatingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavePeriod": {
+      "category": "command",
+      "fixedValue": "15",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "filterChangeStatusCloud": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "freshAirStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "halfDegreeSettingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "healthMode": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "heatAccumulationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humanSensingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humidificationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humiditySel": {
+      "category": "command",
+      "fixedValue": "30",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "intelligenceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lightStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lockStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "machMode": {
+      "category": "command",
+      "defaultValue": "1",
+      "enumValues": [
+       0,
+       1,
+       2,
+       6
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "manualDefrostingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "mouldProofStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "muteStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "onOffStatus": {
+      "category": "command",
+      "fixedValue": "1",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "operationName": {
+      "category": "command",
+      "fixedValue": "grSetDAC",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pm2p5CleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pmvStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "preventHeatstrokeStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "rapidMode": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "screenDisplayStatus": {
+      "category": "command",
+      "defaultValue": "1",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaning56Status": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "selfCleaningStatus": {
+      "category": "command",
+      "fixedValue": "1",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "silentSleepStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "specialMode": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "tempSel": {
+      "category": "command",
+      "defaultValue": "22",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "30",
+      "minimumValue": "16",
+      "typology": "range"
+     },
+     "tempUnit": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceSignStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windDirectionHorizontal": {
+      "category": "command",
+      "defaultValue": "0",
+      "enumValues": [
+       0,
+       3,
+       4,
+       5,
+       6,
+       7
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windDirectionVertical": {
+      "category": "command",
+      "fixedValue": "2",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windSensingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windSpeed": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       5
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     }
+    },
+    "protocolType": "MQTT"
+   },
+   "PROGRAMS.AC.IOT_SELF_CLEAN_56": {
+    "ancillaryParameters": {
+     "programFamily": {
+      "category": "cluster",
+      "defaultValue": "[dashboard|maintenance|health]",
+      "enumValues": [
+       "dashboard",
+       "maintenance",
+       "health"
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "programRules": {
+      "category": "rule",
+      "fixedValue": {
+       "remoteActionable": {
+        "$installationType": {
+         "1to2": {
+          "fixedValue": "0",
+          "typology": "fixed"
+         },
+         "1toN": {
+          "fixedValue": "0",
+          "typology": "fixed"
+         }
+        }
+       },
+       "remoteVisible": {
+        "$installationType": {
+         "1to2": {
+          "fixedValue": "0",
+          "typology": "fixed"
+         },
+         "1toN": {
+          "fixedValue": "0",
+          "typology": "fixed"
+         }
+        }
+       }
+      },
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "remoteActionable": {
+      "category": "general",
+      "defaultValue": "1",
+      "incrementValue": "1",
+      "mandatory": 0,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "remoteVisible": {
+      "category": "general",
+      "defaultValue": "1",
+      "incrementValue": "1",
+      "mandatory": 0,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "windDirectionVerticalPositionSequence": {
+      "category": "general",
+      "enumValues": [
+       1,
+       2,
+       4,
+       5,
+       6,
+       3,
+       8
+      ],
+      "mandatory": 0,
+      "typology": "enum"
+     }
+    },
+    "description": "It takes 60 minutes to self clean. The temperature cannot be changed",
+    "parameters": {
+     "10degreeHeatingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "ch2oCleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "cleaningTimeStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "compressorFrequencyCut": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "dryingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "echoStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "electricHeatingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavePeriod": {
+      "category": "command",
+      "fixedValue": "15",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "filterChangeStatusCloud": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "freshAirStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "halfDegreeSettingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "healthMode": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "heatAccumulationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humanSensingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humidificationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humiditySel": {
+      "category": "command",
+      "fixedValue": "30",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "intelligenceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lightStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lockStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "machMode": {
+      "category": "command",
+      "defaultValue": "1",
+      "enumValues": [
+       0,
+       1,
+       2,
+       4,
+       6
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "manualDefrostingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "mouldProofStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "muteStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "onOffStatus": {
+      "category": "command",
+      "fixedValue": "1",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "operationName": {
+      "category": "command",
+      "fixedValue": "grSetDAC",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pm2p5CleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pmvStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "preventHeatstrokeStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "rapidMode": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "screenDisplayStatus": {
+      "category": "command",
+      "defaultValue": "1",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaning56Status": {
+      "category": "command",
+      "fixedValue": "1",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "selfCleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "silentSleepStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "specialMode": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "tempSel": {
+      "category": "command",
+      "defaultValue": "22",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "30",
+      "minimumValue": "16",
+      "typology": "range"
+     },
+     "tempUnit": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceSignStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windDirectionHorizontal": {
+      "category": "command",
+      "defaultValue": "0",
+      "enumValues": [
+       0,
+       3,
+       4,
+       5,
+       6,
+       7
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windDirectionVertical": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       8
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windSensingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windSpeed": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       5
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     }
+    },
+    "protocolType": "MQTT"
+   },
+   "PROGRAMS.AC.IOT_SIMPLE_START": {
+    "ancillaryParameters": {
+     "programRules": {
+      "category": "rule",
+      "fixedValue": {
+       "selfCleaning56Status": {
+        "$installationType": {
+         "1to2": {
+          "fixedValue": "0",
+          "typology": "fixed"
+         },
+         "1toN": {
+          "fixedValue": "0",
+          "typology": "fixed"
+         }
+        }
+       },
+       "selfCleaningStatus": {
+        "$installationType": {
+         "1toN": {
+          "fixedValue": "0",
+          "typology": "fixed"
+         }
+        }
+       }
+      },
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "remoteActionable": {
+      "category": "general",
+      "fixedValue": "1",
+      "mandatory": 0,
+      "typology": "fixed"
+     },
+     "remoteVisible": {
+      "category": "general",
+      "fixedValue": "0",
+      "mandatory": 0,
+      "typology": "fixed"
+     },
+     "windDirectionVerticalPositionSequence": {
+      "category": "general",
+      "enumValues": [
+       1,
+       2,
+       4,
+       5,
+       6,
+       3,
+       8
+      ],
+      "mandatory": 0,
+      "typology": "enum"
+     }
+    },
+    "description": "The command allows to start a program",
+    "parameters": {
+     "10degreeHeatingStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "ch2oCleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "cleaningTimeStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "compressorFrequencyCut": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "3",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "dryingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "echoStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "electricHeatingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavePeriod": {
+      "category": "command",
+      "fixedValue": "15",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "filterChangeStatusCloud": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "freshAirStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "halfDegreeSettingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "healthMode": {
+      "category": "command",
+      "defaultValue": "0",
+      "enumValues": [
+       0,
+       1
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "heatAccumulationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humanSensingStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "3",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "humidificationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humiditySel": {
+      "category": "command",
+      "defaultValue": "30",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "90",
+      "minimumValue": "30",
+      "typology": "range"
+     },
+     "intelligenceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lightStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lockStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "machMode": {
+      "category": "command",
+      "defaultValue": "0",
+      "enumValues": [
+       0,
+       1,
+       2,
+       4,
+       6
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "manualDefrostingStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "mouldProofStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "muteStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "onOffStatus": {
+      "category": "command",
+      "fixedValue": "1",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "operationName": {
+      "category": "command",
+      "fixedValue": "grSetDAC",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pm2p5CleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pmvStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "preventHeatstrokeStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "rapidMode": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "screenDisplayStatus": {
+      "category": "command",
+      "defaultValue": "1",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaning56Status": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaningStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "silentSleepStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "specialMode": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "tempSel": {
+      "category": "command",
+      "defaultValue": "22",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "30",
+      "minimumValue": "16",
+      "typology": "range"
+     },
+     "tempUnit": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceSignStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windDirectionHorizontal": {
+      "category": "command",
+      "defaultValue": "0",
+      "enumValues": [
+       0,
+       3,
+       4,
+       5,
+       6,
+       7
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windDirectionVertical": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       8
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windSensingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windSpeed": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       5
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     }
+    },
+    "protocolType": "MQTT"
+   },
+   "PROGRAMS.AC.IOT_UV": {
+    "ancillaryParameters": {
+     "programFamily": {
+      "category": "cluster",
+      "defaultValue": "[health]",
+      "enumValues": [
+       "health"
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "remoteActionable": {
+      "category": "general",
+      "fixedValue": "1",
+      "mandatory": 0,
+      "typology": "fixed"
+     },
+     "remoteVisible": {
+      "category": "general",
+      "fixedValue": "1",
+      "mandatory": 0,
+      "typology": "fixed"
+     },
+     "windDirectionVerticalPositionSequence": {
+      "category": "general",
+      "enumValues": [
+       1,
+       2,
+       4,
+       5,
+       6,
+       3,
+       8
+      ],
+      "mandatory": 0,
+      "typology": "enum"
+     }
+    },
+    "description": "In this mode the AC will activate UV rays to kill bacteria and create a hygienic environment.",
+    "parameters": {
+     "10degreeHeatingStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "ch2oCleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "cleaningTimeStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "compressorFrequencyCut": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "3",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "dryingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "echoStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "electricHeatingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavePeriod": {
+      "category": "command",
+      "fixedValue": "15",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "filterChangeStatusCloud": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "freshAirStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "halfDegreeSettingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "healthMode": {
+      "category": "command",
+      "fixedValue": "1",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "heatAccumulationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humanSensingStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "3",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "humidificationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humiditySel": {
+      "category": "command",
+      "fixedValue": "30",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "intelligenceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lightStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lockStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "machMode": {
+      "category": "command",
+      "defaultValue": "0",
+      "enumValues": [
+       0,
+       1,
+       2,
+       4,
+       6
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "manualDefrostingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "mouldProofStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "muteStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "onOffStatus": {
+      "category": "command",
+      "fixedValue": "1",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "operationName": {
+      "category": "command",
+      "fixedValue": "grSetDAC",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pm2p5CleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pmvStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "preventHeatstrokeStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "rapidMode": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "screenDisplayStatus": {
+      "category": "command",
+      "defaultValue": "1",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaning56Status": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaningStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "silentSleepStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "specialMode": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "tempSel": {
+      "category": "command",
+      "defaultValue": "22",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "30",
+      "minimumValue": "16",
+      "typology": "range"
+     },
+     "tempUnit": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceSignStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windDirectionHorizontal": {
+      "category": "command",
+      "defaultValue": "0",
+      "enumValues": [
+       0,
+       3,
+       4,
+       5,
+       6,
+       7
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windDirectionVertical": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       8
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windSensingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windSpeed": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       5
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     }
+    },
+    "protocolType": "MQTT"
+   },
+   "PROGRAMS.AC.IOT_UV_AND_AUTO": {
+    "ancillaryParameters": {
+     "programFamily": {
+      "category": "cluster",
+      "defaultValue": "[standard]",
+      "enumValues": [
+       "standard"
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "remoteActionable": {
+      "category": "general",
+      "fixedValue": "1",
+      "mandatory": 0,
+      "typology": "fixed"
+     },
+     "remoteVisible": {
+      "category": "general",
+      "fixedValue": "1",
+      "mandatory": 0,
+      "typology": "fixed"
+     },
+     "windDirectionVerticalPositionSequence": {
+      "category": "general",
+      "enumValues": [
+       1,
+       2,
+       4,
+       5,
+       6,
+       3,
+       8
+      ],
+      "mandatory": 0,
+      "typology": "enum"
+     }
+    },
+    "description": "In this mode the AC will activate UV rays to kill bacteria and create a hygienic environment.",
+    "parameters": {
+     "10degreeHeatingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "ch2oCleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "cleaningTimeStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "compressorFrequencyCut": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "3",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "dryingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "echoStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "electricHeatingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavePeriod": {
+      "category": "command",
+      "fixedValue": "15",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "filterChangeStatusCloud": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "freshAirStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "halfDegreeSettingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "healthMode": {
+      "category": "command",
+      "fixedValue": "1",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "heatAccumulationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humanSensingStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "3",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "humidificationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humiditySel": {
+      "category": "command",
+      "fixedValue": "30",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "intelligenceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lightStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lockStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "machMode": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "manualDefrostingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "mouldProofStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "muteStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "onOffStatus": {
+      "category": "command",
+      "fixedValue": "1",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "operationName": {
+      "category": "command",
+      "fixedValue": "grSetDAC",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pm2p5CleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pmvStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "preventHeatstrokeStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "rapidMode": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "screenDisplayStatus": {
+      "category": "command",
+      "defaultValue": "1",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaning56Status": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaningStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "silentSleepStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "specialMode": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "tempSel": {
+      "category": "command",
+      "defaultValue": "24",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "30",
+      "minimumValue": "16",
+      "typology": "range"
+     },
+     "tempUnit": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceSignStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windDirectionHorizontal": {
+      "category": "command",
+      "defaultValue": "0",
+      "enumValues": [
+       0,
+       3,
+       4,
+       5,
+       6,
+       7
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windDirectionVertical": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       8
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windSensingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windSpeed": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       5
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     }
+    },
+    "protocolType": "MQTT"
+   },
+   "PROGRAMS.AC.IOT_UV_AND_COOL": {
+    "ancillaryParameters": {
+     "programFamily": {
+      "category": "cluster",
+      "defaultValue": "[dashboard|standard]",
+      "enumValues": [
+       "dashboard",
+       "standard"
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "remoteActionable": {
+      "category": "general",
+      "fixedValue": "1",
+      "mandatory": 0,
+      "typology": "fixed"
+     },
+     "remoteVisible": {
+      "category": "general",
+      "fixedValue": "1",
+      "mandatory": 0,
+      "typology": "fixed"
+     },
+     "windDirectionVerticalPositionSequence": {
+      "category": "general",
+      "enumValues": [
+       1,
+       2,
+       4,
+       5,
+       6,
+       3,
+       8
+      ],
+      "mandatory": 0,
+      "typology": "enum"
+     }
+    },
+    "description": "In this mode the AC will activate UV rays to kill bacteria and create a hygienic environment.",
+    "parameters": {
+     "10degreeHeatingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "ch2oCleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "cleaningTimeStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "compressorFrequencyCut": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "3",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "dryingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "echoStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "electricHeatingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavePeriod": {
+      "category": "command",
+      "fixedValue": "15",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "filterChangeStatusCloud": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "freshAirStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "halfDegreeSettingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "healthMode": {
+      "category": "command",
+      "fixedValue": "1",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "heatAccumulationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humanSensingStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "3",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "humidificationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humiditySel": {
+      "category": "command",
+      "fixedValue": "30",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "intelligenceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lightStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lockStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "machMode": {
+      "category": "command",
+      "fixedValue": "1",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "manualDefrostingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "mouldProofStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "muteStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "onOffStatus": {
+      "category": "command",
+      "fixedValue": "1",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "operationName": {
+      "category": "command",
+      "fixedValue": "grSetDAC",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pm2p5CleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pmvStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "preventHeatstrokeStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "rapidMode": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "screenDisplayStatus": {
+      "category": "command",
+      "defaultValue": "1",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaning56Status": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaningStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "silentSleepStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "specialMode": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "tempSel": {
+      "category": "command",
+      "defaultValue": "22",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "30",
+      "minimumValue": "16",
+      "typology": "range"
+     },
+     "tempUnit": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceSignStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windDirectionHorizontal": {
+      "category": "command",
+      "defaultValue": "0",
+      "enumValues": [
+       0,
+       3,
+       4,
+       5,
+       6,
+       7
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windDirectionVertical": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       8
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windSensingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windSpeed": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       5
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     }
+    },
+    "protocolType": "MQTT"
+   },
+   "PROGRAMS.AC.IOT_UV_AND_DRY": {
+    "ancillaryParameters": {
+     "programFamily": {
+      "category": "cluster",
+      "defaultValue": "[dashboard|standard]",
+      "enumValues": [
+       "dashboard",
+       "standard"
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "remoteActionable": {
+      "category": "general",
+      "fixedValue": "1",
+      "mandatory": 0,
+      "typology": "fixed"
+     },
+     "remoteVisible": {
+      "category": "general",
+      "fixedValue": "1",
+      "mandatory": 0,
+      "typology": "fixed"
+     },
+     "windDirectionVerticalPositionSequence": {
+      "category": "general",
+      "enumValues": [
+       1,
+       2,
+       4,
+       5,
+       6,
+       3,
+       8
+      ],
+      "mandatory": 0,
+      "typology": "enum"
+     }
+    },
+    "description": "In this mode the AC will activate UV rays to kill bacteria and create a hygienic environment.",
+    "parameters": {
+     "10degreeHeatingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "ch2oCleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "cleaningTimeStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "compressorFrequencyCut": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "3",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "dryingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "echoStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "electricHeatingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavePeriod": {
+      "category": "command",
+      "fixedValue": "15",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "filterChangeStatusCloud": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "freshAirStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "halfDegreeSettingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "healthMode": {
+      "category": "command",
+      "fixedValue": "1",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "heatAccumulationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humanSensingStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "3",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "humidificationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humiditySel": {
+      "category": "command",
+      "defaultValue": "30",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "90",
+      "minimumValue": "30",
+      "typology": "range"
+     },
+     "intelligenceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lightStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lockStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "machMode": {
+      "category": "command",
+      "fixedValue": "2",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "manualDefrostingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "mouldProofStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "muteStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "onOffStatus": {
+      "category": "command",
+      "fixedValue": "1",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "operationName": {
+      "category": "command",
+      "fixedValue": "grSetDAC",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pm2p5CleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pmvStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "preventHeatstrokeStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "rapidMode": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "screenDisplayStatus": {
+      "category": "command",
+      "defaultValue": "1",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaning56Status": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaningStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "silentSleepStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "specialMode": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "tempSel": {
+      "category": "command",
+      "defaultValue": "22",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "30",
+      "minimumValue": "16",
+      "typology": "range"
+     },
+     "tempUnit": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceSignStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windDirectionHorizontal": {
+      "category": "command",
+      "defaultValue": "0",
+      "enumValues": [
+       0,
+       3,
+       4,
+       5,
+       6,
+       7
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windDirectionVertical": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       8
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windSensingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windSpeed": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       5
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     }
+    },
+    "protocolType": "MQTT"
+   },
+   "PROGRAMS.AC.IOT_UV_AND_FAN": {
+    "ancillaryParameters": {
+     "programFamily": {
+      "category": "cluster",
+      "defaultValue": "[dashboard|standard]",
+      "enumValues": [
+       "dashboard",
+       "standard"
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "remoteActionable": {
+      "category": "general",
+      "fixedValue": "1",
+      "mandatory": 0,
+      "typology": "fixed"
+     },
+     "remoteVisible": {
+      "category": "general",
+      "fixedValue": "1",
+      "mandatory": 0,
+      "typology": "fixed"
+     },
+     "windDirectionVerticalPositionSequence": {
+      "category": "general",
+      "enumValues": [
+       1,
+       2,
+       4,
+       5,
+       6,
+       3,
+       8
+      ],
+      "mandatory": 0,
+      "typology": "enum"
+     }
+    },
+    "description": "In this mode the AC will activate UV rays to kill bacteria and create a hygienic environment.",
+    "parameters": {
+     "10degreeHeatingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "ch2oCleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "cleaningTimeStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "compressorFrequencyCut": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "dryingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "echoStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "electricHeatingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavePeriod": {
+      "category": "command",
+      "fixedValue": "15",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "filterChangeStatusCloud": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "freshAirStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "halfDegreeSettingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "healthMode": {
+      "category": "command",
+      "fixedValue": "1",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "heatAccumulationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humanSensingStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "3",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "humidificationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humiditySel": {
+      "category": "command",
+      "fixedValue": "30",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "intelligenceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lightStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lockStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "machMode": {
+      "category": "command",
+      "fixedValue": "6",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "manualDefrostingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "mouldProofStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "muteStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "onOffStatus": {
+      "category": "command",
+      "fixedValue": "1",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "operationName": {
+      "category": "command",
+      "fixedValue": "grSetDAC",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pm2p5CleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pmvStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "preventHeatstrokeStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "rapidMode": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "screenDisplayStatus": {
+      "category": "command",
+      "defaultValue": "1",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaning56Status": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaningStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "silentSleepStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "specialMode": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "tempSel": {
+      "category": "command",
+      "defaultValue": "22",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "30",
+      "minimumValue": "16",
+      "typology": "range"
+     },
+     "tempUnit": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceSignStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windDirectionHorizontal": {
+      "category": "command",
+      "defaultValue": "0",
+      "enumValues": [
+       0,
+       3,
+       4,
+       5,
+       6,
+       7
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windDirectionVertical": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       8
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windSensingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windSpeed": {
+      "category": "command",
+      "defaultValue": "3",
+      "enumValues": [
+       1,
+       2,
+       3
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     }
+    },
+    "protocolType": "MQTT"
+   },
+   "PROGRAMS.AC.IOT_UV_AND_HEAT": {
+    "ancillaryParameters": {
+     "programFamily": {
+      "category": "cluster",
+      "defaultValue": "[dashboard|standard]",
+      "enumValues": [
+       "dashboard",
+       "standard"
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "remoteActionable": {
+      "category": "general",
+      "fixedValue": "1",
+      "mandatory": 0,
+      "typology": "fixed"
+     },
+     "remoteVisible": {
+      "category": "general",
+      "fixedValue": "1",
+      "mandatory": 0,
+      "typology": "fixed"
+     },
+     "windDirectionVerticalPositionSequence": {
+      "category": "general",
+      "enumValues": [
+       1,
+       2,
+       4,
+       5,
+       6,
+       7,
+       3,
+       8
+      ],
+      "mandatory": 0,
+      "typology": "enum"
+     }
+    },
+    "description": "In this mode the AC will activate UV rays to kill bacteria and create a hygienic environment.",
+    "parameters": {
+     "10degreeHeatingStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "ch2oCleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "cleaningTimeStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "compressorFrequencyCut": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "3",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "dryingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "echoStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "electricHeatingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavePeriod": {
+      "category": "command",
+      "fixedValue": "15",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "energySavingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "filterChangeStatusCloud": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "freshAirStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "halfDegreeSettingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "healthMode": {
+      "category": "command",
+      "fixedValue": "1",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "heatAccumulationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humanSensingStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "3",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "humidificationStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "humiditySel": {
+      "category": "command",
+      "fixedValue": "30",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "intelligenceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lightStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "lockStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "machMode": {
+      "category": "command",
+      "fixedValue": "4",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "manualDefrostingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "mouldProofStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "muteStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "onOffStatus": {
+      "category": "command",
+      "fixedValue": "1",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "operationName": {
+      "category": "command",
+      "fixedValue": "grSetDAC",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pm2p5CleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "pmvStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "preventHeatstrokeStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "rapidMode": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "screenDisplayStatus": {
+      "category": "command",
+      "defaultValue": "1",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaning56Status": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "selfCleaningStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "silentSleepStatus": {
+      "category": "command",
+      "defaultValue": "0",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "1",
+      "minimumValue": "0",
+      "typology": "range"
+     },
+     "specialMode": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "tempSel": {
+      "category": "command",
+      "defaultValue": "22",
+      "incrementValue": "1",
+      "mandatory": 1,
+      "maximumValue": "30",
+      "minimumValue": "16",
+      "typology": "range"
+     },
+     "tempUnit": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceSignStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "voiceStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windDirectionHorizontal": {
+      "category": "command",
+      "defaultValue": "0",
+      "enumValues": [
+       0,
+       3,
+       4,
+       5,
+       6,
+       7
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windDirectionVertical": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     },
+     "windSensingStatus": {
+      "category": "command",
+      "fixedValue": "0",
+      "mandatory": 1,
+      "typology": "fixed"
+     },
+     "windSpeed": {
+      "category": "command",
+      "defaultValue": "5",
+      "enumValues": [
+       1,
+       2,
+       3,
+       5
+      ],
+      "mandatory": 1,
+      "typology": "enum"
+     }
+    },
+    "protocolType": "MQTT"
+   }
+  },
+  "stopProgram": {
+   "ancillaryParameters": {
+    "remoteActionable": {
+     "category": "general",
+     "fixedValue": "1",
+     "mandatory": 0,
+     "typology": "fixed"
+    },
+    "remoteVisible": {
+     "category": "general",
+     "fixedValue": "1",
+     "mandatory": 0,
+     "typology": "fixed"
+    },
+    "windDirectionVerticalPositionSequence": {
+     "category": "general",
+     "enumValues": [
+      1,
+      2,
+      4,
+      5,
+      6,
+      3,
+      8
+     ],
+     "mandatory": 0,
+     "typology": "enum"
+    }
+   },
+   "description": "The message allows to stop the program",
+   "parameters": {
+    "10degreeHeatingStatus": {
+     "category": "command",
+     "defaultValue": "0",
+     "incrementValue": "1",
+     "mandatory": 1,
+     "maximumValue": "1",
+     "minimumValue": "0",
+     "typology": "range"
+    },
+    "ch2oCleaningStatus": {
+     "category": "command",
+     "fixedValue": "0",
+     "mandatory": 1,
+     "typology": "fixed"
+    },
+    "cleaningTimeStatus": {
+     "category": "command",
+     "fixedValue": "0",
+     "mandatory": 1,
+     "typology": "fixed"
+    },
+    "compressorFrequencyCut": {
+     "category": "command",
+     "defaultValue": "0",
+     "incrementValue": "1",
+     "mandatory": 1,
+     "maximumValue": "3",
+     "minimumValue": "0",
+     "typology": "range"
+    },
+    "dryingStatus": {
+     "category": "command",
+     "fixedValue": "0",
+     "mandatory": 1,
+     "typology": "fixed"
+    },
+    "echoStatus": {
+     "category": "command",
+     "defaultValue": "0",
+     "incrementValue": "1",
+     "mandatory": 1,
+     "maximumValue": "1",
+     "minimumValue": "0",
+     "typology": "range"
+    },
+    "electricHeatingStatus": {
+     "category": "command",
+     "fixedValue": "0",
+     "mandatory": 1,
+     "typology": "fixed"
+    },
+    "energySavePeriod": {
+     "category": "command",
+     "fixedValue": "15",
+     "mandatory": 1,
+     "typology": "fixed"
+    },
+    "energySavingStatus": {
+     "category": "command",
+     "fixedValue": "0",
+     "mandatory": 1,
+     "typology": "fixed"
+    },
+    "filterChangeStatusCloud": {
+     "category": "command",
+     "fixedValue": "0",
+     "mandatory": 1,
+     "typology": "fixed"
+    },
+    "freshAirStatus": {
+     "category": "command",
+     "fixedValue": "0",
+     "mandatory": 1,
+     "typology": "fixed"
+    },
+    "halfDegreeSettingStatus": {
+     "category": "command",
+     "fixedValue": "0",
+     "mandatory": 1,
+     "typology": "fixed"
+    },
+    "healthMode": {
+     "category": "command",
+     "defaultValue": "0",
+     "enumValues": [
+      0,
+      1
+     ],
+     "mandatory": 1,
+     "typology": "enum"
+    },
+    "heatAccumulationStatus": {
+     "category": "command",
+     "fixedValue": "0",
+     "mandatory": 1,
+     "typology": "fixed"
+    },
+    "humanSensingStatus": {
+     "category": "command",
+     "defaultValue": "0",
+     "incrementValue": "1",
+     "mandatory": 1,
+     "maximumValue": "3",
+     "minimumValue": "0",
+     "typology": "range"
+    },
+    "humidificationStatus": {
+     "category": "command",
+     "fixedValue": "0",
+     "mandatory": 1,
+     "typology": "fixed"
+    },
+    "humiditySel": {
+     "category": "command",
+     "fixedValue": "52",
+     "mandatory": 1,
+     "typology": "fixed"
+    },
+    "intelligenceStatus": {
+     "category": "command",
+     "fixedValue": "0",
+     "mandatory": 1,
+     "typology": "fixed"
+    },
+    "lightStatus": {
+     "category": "command",
+     "fixedValue": "0",
+     "mandatory": 1,
+     "typology": "fixed"
+    },
+    "lockStatus": {
+     "category": "command",
+     "fixedValue": "0",
+     "mandatory": 1,
+     "typology": "fixed"
+    },
+    "machMode": {
+     "category": "command",
+     "defaultValue": "0",
+     "enumValues": [
+      0,
+      1,
+      2,
+      4,
+      6
+     ],
+     "mandatory": 1,
+     "typology": "enum"
+    },
+    "manualDefrostingStatus": {
+     "category": "command",
+     "defaultValue": "0",
+     "incrementValue": "1",
+     "mandatory": 1,
+     "maximumValue": "1",
+     "minimumValue": "0",
+     "typology": "range"
+    },
+    "mouldProofStatus": {
+     "category": "command",
+     "defaultValue": "0",
+     "incrementValue": "1",
+     "mandatory": 1,
+     "maximumValue": "1",
+     "minimumValue": "0",
+     "typology": "range"
+    },
+    "muteStatus": {
+     "category": "command",
+     "defaultValue": "0",
+     "incrementValue": "1",
+     "mandatory": 1,
+     "maximumValue": "1",
+     "minimumValue": "0",
+     "typology": "range"
+    },
+    "onOffStatus": {
+     "category": "command",
+     "fixedValue": "0",
+     "mandatory": 1,
+     "typology": "fixed"
+    },
+    "operationName": {
+     "category": "command",
+     "fixedValue": "grSetDAC",
+     "mandatory": 1,
+     "typology": "fixed"
+    },
+    "pm2p5CleaningStatus": {
+     "category": "command",
+     "fixedValue": "0",
+     "mandatory": 1,
+     "typology": "fixed"
+    },
+    "pmvStatus": {
+     "category": "command",
+     "fixedValue": "0",
+     "mandatory": 1,
+     "typology": "fixed"
+    },
+    "preventHeatstrokeStatus": {
+     "category": "command",
+     "defaultValue": "0",
+     "incrementValue": "1",
+     "mandatory": 1,
+     "maximumValue": "1",
+     "minimumValue": "0",
+     "typology": "range"
+    },
+    "rapidMode": {
+     "category": "command",
+     "defaultValue": "0",
+     "incrementValue": "1",
+     "mandatory": 1,
+     "maximumValue": "1",
+     "minimumValue": "0",
+     "typology": "range"
+    },
+    "screenDisplayStatus": {
+     "category": "command",
+     "defaultValue": "1",
+     "incrementValue": "1",
+     "mandatory": 1,
+     "maximumValue": "1",
+     "minimumValue": "0",
+     "typology": "range"
+    },
+    "selfCleaning56Status": {
+     "category": "command",
+     "defaultValue": "0",
+     "incrementValue": "1",
+     "mandatory": 1,
+     "maximumValue": "1",
+     "minimumValue": "0",
+     "typology": "range"
+    },
+    "selfCleaningStatus": {
+     "category": "command",
+     "defaultValue": "0",
+     "incrementValue": "1",
+     "mandatory": 1,
+     "maximumValue": "1",
+     "minimumValue": "0",
+     "typology": "range"
+    },
+    "silentSleepStatus": {
+     "category": "command",
+     "defaultValue": "0",
+     "incrementValue": "1",
+     "mandatory": 1,
+     "maximumValue": "1",
+     "minimumValue": "0",
+     "typology": "range"
+    },
+    "specialMode": {
+     "category": "command",
+     "fixedValue": "0",
+     "mandatory": 1,
+     "typology": "fixed"
+    },
+    "tempSel": {
+     "category": "command",
+     "defaultValue": "22",
+     "incrementValue": "1",
+     "mandatory": 1,
+     "maximumValue": "30",
+     "minimumValue": "16",
+     "typology": "range"
+    },
+    "tempUnit": {
+     "category": "command",
+     "fixedValue": "0",
+     "mandatory": 1,
+     "typology": "fixed"
+    },
+    "voiceSignStatus": {
+     "category": "command",
+     "fixedValue": "0",
+     "mandatory": 1,
+     "typology": "fixed"
+    },
+    "voiceStatus": {
+     "category": "command",
+     "fixedValue": "0",
+     "mandatory": 1,
+     "typology": "fixed"
+    },
+    "windDirectionHorizontal": {
+     "category": "command",
+     "defaultValue": "0",
+     "enumValues": [
+      0,
+      3,
+      4,
+      5,
+      6,
+      7
+     ],
+     "mandatory": 1,
+     "typology": "enum"
+    },
+    "windDirectionVertical": {
+     "category": "command",
+     "defaultValue": "5",
+     "enumValues": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      8
+     ],
+     "mandatory": 1,
+     "typology": "enum"
+    },
+    "windSensingStatus": {
+     "category": "command",
+     "fixedValue": "0",
+     "mandatory": 1,
+     "typology": "fixed"
+    },
+    "windSpeed": {
+     "category": "command",
+     "defaultValue": "5",
+     "enumValues": [
+      1,
+      2,
+      3,
+      5
+     ],
+     "mandatory": 1,
+     "typology": "enum"
+    }
+   },
+   "protocolType": "MQTT"
+  }
+ }
+}

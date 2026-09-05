@@ -18,7 +18,7 @@ jobs:
           cache: pip
       - run: pip install -e '.[dev]'
       - run: ruff check .
-      - run: mypy app
+      - run: mypy app tests
       - run: pytest -q
       - run: node --test tests/test_ui_state.js
       - run: bash -n scripts/deploy-homelab.sh

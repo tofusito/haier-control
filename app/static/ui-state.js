@@ -56,6 +56,33 @@
     return !(session && (session.token || session.trustedNetwork));
   }
 
+  // The whole boot decision in one pure place. It used to be an if-chain inside
+  // boot() that also touched the DOM, which is how the trusted-network session
+  // ended up correctly detected and then immediately overruled.
+  function decideBootAction(input) {
+    const health = (input && input.health) || {};
+    const setup = (input && input.setup) || {};
+    const session = (input && input.session) || {};
+    const storeToken =
+      setup.status === "complete" && setup.api_token && !session.trustedNetwork
+        ? setup.api_token
+        : null;
+
+    if (setup.status === "mfa_required") {
+      return { action: "otp", flow: { id: setup.flow_id, csrf: setup.csrf_token }, storeToken };
+    }
+    if (health.setup_required) {
+      return {
+        action: "haier-setup",
+        reconnect: Boolean(session.token || storeToken),
+        message: setup.status === "failed" && setup.message ? setup.message : "",
+        storeToken,
+      };
+    }
+    const resolved = { token: session.token || storeToken, trustedNetwork: session.trustedNetwork };
+    return { action: needsLocalToken(resolved) ? "token" : "dashboard", storeToken };
+  }
+
   function mergeTimerMutations(remoteTimers, mutations) {
     const merged = new Map((remoteTimers || []).map(timer => [timer.id, timer]));
     const remoteByKey = new Map((remoteTimers || []).map(timer => [timer.idempotency_key, timer.id]));
@@ -178,5 +205,5 @@
     return { send, reconcileDevices, commandMatches, applyOptimisticState, presentPowerState, mergeTimerMutations, needsLocalToken };
   }
 
-  return { createCommandController, applyOptimisticState, commandMatches, presentPowerState, mergeTimerMutations, needsLocalToken };
+  return { createCommandController, applyOptimisticState, commandMatches, presentPowerState, mergeTimerMutations, needsLocalToken, decideBootAction };
 }));

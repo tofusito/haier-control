@@ -146,6 +146,7 @@ def create_app(
             database,
             key,
             config.haier_client_id,
+            deliver_browser_token=not config.trusted_network_mode,
         )
         app.state.settings = config
         app.state.master_key = key

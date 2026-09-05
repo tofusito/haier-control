@@ -51,3 +51,14 @@ ignore = ["S101", "B008"]
 python_version = "3.12"
 strict = true
 plugins = ["pydantic.mypy"]
+# tests/ has no __init__.py, so without these mypy sees each test file under two
+# module names and refuses to check anything at all.
+explicit_package_bases = true
+mypy_path = "."
+
+[[tool.mypy.overrides]]
+# Test doubles duck-type the real collaborators and reach into private attributes
+# on purpose. Strict mode still applies to app/, which is what ships.
+module = "tests.*"
+disallow_untyped_defs = false
+disable_error_code = ["arg-type", "method-assign", "no-any-return", "type-arg", "unused-ignore"]

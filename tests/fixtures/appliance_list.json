@@ -1,0 +1,235 @@
+{
+ "executionTime": 116,
+ "modules": {
+  "applianceList": {
+   "authInfo": {
+    "cognitoTokenNew": "REDACTED_SECRET"
+   },
+   "executionTime": 116,
+   "payload": {
+    "appliances": [
+     {
+      "PK": "user#eu-west-1:c0f806c3-fa07-c348-a762-7858a9675676",
+      "SK": "app#AA:BB:CC:DD:EE:10",
+      "SK_Secondary": "AC#selfClean56#2026-09-08",
+      "applianceId": "AA:BB:CC:DD:EE:10#2026-07-10T11:38:24Z",
+      "applianceModelId": 15253,
+      "applianceStatus": 1,
+      "applianceTypeId": 11,
+      "applianceTypeName": "AC",
+      "attributes": [
+       {
+        "id": 555853277,
+        "lastUpdate": "2026-07-10T11:38:44Z",
+        "parName": "acuVersion",
+        "parValue": "0.0.0",
+        "status": 1
+       },
+       {
+        "id": 555853274,
+        "lastUpdate": "2026-07-10T11:38:44Z",
+        "parName": "chipset",
+        "parValue": "1",
+        "status": 1
+       },
+       {
+        "id": 565297922,
+        "lastUpdate": "2026-09-04T14:45:40Z",
+        "parName": "dictionaryId",
+        "parValue": "718",
+        "status": 1
+       },
+       {
+        "id": 555853435,
+        "lastUpdate": "2026-07-10T11:40:02Z",
+        "parName": "eppParserSet",
+        "parValue": "1",
+        "status": 1
+       },
+       {
+        "id": 555853280,
+        "lastUpdate": "2026-07-10T11:38:44Z",
+        "parName": "fwLabel",
+        "parValue": "iotfw_epp_ulg",
+        "status": 1
+       },
+       {
+        "id": 555853276,
+        "lastUpdate": "2026-07-10T11:38:44Z",
+        "parName": "idfVersion",
+        "parValue": "4.4.5",
+        "status": 1
+       },
+       {
+        "id": 555853275,
+        "lastUpdate": "2026-07-10T11:38:44Z",
+        "parName": "kernelVersion",
+        "parValue": "10.4.3",
+        "status": 1
+       },
+       {
+        "id": 555853273,
+        "lastUpdate": "2026-07-10T11:38:44Z",
+        "parName": "lang",
+        "parValue": "it-IT",
+        "status": 1
+       },
+       {
+        "id": 555853434,
+        "lastUpdate": "2026-07-10T11:40:02Z",
+        "parName": "uiVersion",
+        "parValue": "02.00.00",
+        "status": 1
+       }
+      ],
+      "brand": "haier",
+      "code": "AACWH0E0000",
+      "connectivity": "wifi|ble",
+      "coords": "REDACTED_LOCATION",
+      "eepromId": 41,
+      "eepromName": "no_eeprom",
+      "enrollmentDate": "2026-07-10T11:38:24.880Z",
+      "firstEnrollment": true,
+      "firstEnrollmentTBC": true,
+      "fwVersion": "6.14.0",
+      "id": 15253,
+      "lastUpdate": "2026-07-10T11:38:44Z",
+      "macAddress": "AA:BB:CC:DD:EE:10",
+      "modelName": "AS25SBBHRA-MW",
+      "nickName": "Salon",
+      "sections": {
+       "chatbot": true,
+       "double_pairing_hidden": true,
+       "epp_enabled": false
+      },
+      "serialNumber": "REDACTED",
+      "series": "s",
+      "seriesVersion": "s",
+      "sfPersonAccountId": "REDACTED",
+      "topics": {
+       "publish": [],
+       "subscribe": [
+        "$aws/events/presence/disconnected/AA:BB:CC:DD:EE:10",
+        "$aws/events/presence/connected/AA:BB:CC:DD:EE:10",
+        "haier/things/AA:BB:CC:DD:EE:10/event/appliancestatus/update",
+        "haier/things/AA:BB:CC:DD:EE:10/event/discovery/update"
+       ]
+      },
+      "unitConfiguration": "1to2"
+     },
+     {
+      "PK": "user#eu-west-1:c0f806c3-fa07-c348-a762-7858a9675676",
+      "SK": "app#AA:BB:CC:DD:EE:11",
+      "SK_Secondary": "AC#selfClean56#2026-09-08",
+      "applianceId": "AA:BB:CC:DD:EE:11#2026-07-10T12:04:46Z",
+      "applianceModelId": 15703,
+      "applianceStatus": 1,
+      "applianceTypeId": 11,
+      "applianceTypeName": "AC",
+      "attributes": [
+       {
+        "id": 555856893,
+        "lastUpdate": "2026-07-10T12:05:06Z",
+        "parName": "acuVersion",
+        "parValue": "0.0.0",
+        "status": 1
+       },
+       {
+        "id": 555856890,
+        "lastUpdate": "2026-07-10T12:05:06Z",
+        "parName": "chipset",
+        "parValue": "1",
+        "status": 1
+       },
+       {
+        "id": 565297924,
+        "lastUpdate": "2026-09-04T14:45:41Z",
+        "parName": "dictionaryId",
+        "parValue": "718",
+        "status": 1
+       },
+       {
+        "id": 555857061,
+        "lastUpdate": "2026-07-10T12:06:22Z",
+        "parName": "eppParserSet",
+        "parValue": "1",
+        "status": 1
+       },
+       {
+        "id": 555856896,
+        "lastUpdate": "2026-07-10T12:05:06Z",
+        "parName": "fwLabel",
+        "parValue": "iotfw_epp_ulg",
+        "status": 1
+       },
+       {
+        "id": 555856892,
+        "lastUpdate": "2026-07-10T12:05:06Z",
+        "parName": "idfVersion",
+        "parValue": "4.4.5",
+        "status": 1
+       },
+       {
+        "id": 555856891,
+        "lastUpdate": "2026-07-10T12:05:06Z",
+        "parName": "kernelVersion",
+        "parValue": "10.4.3",
+        "status": 1
+       },
+       {
+        "id": 555856889,
+        "lastUpdate": "2026-07-10T12:05:06Z",
+        "parName": "lang",
+        "parValue": "it-IT",
+        "status": 1
+       },
+       {
+        "id": 555857060,
+        "lastUpdate": "2026-07-10T12:06:22Z",
+        "parName": "uiVersion",
+        "parValue": "02.00.00",
+        "status": 1
+       }
+      ],
+      "brand": "haier",
+      "code": "AACWL0E0000",
+      "connectivity": "wifi|ble",
+      "coords": "REDACTED_LOCATION",
+      "eepromId": 41,
+      "eepromName": "no_eeprom",
+      "enrollmentDate": "2026-07-10T12:04:46.429Z",
+      "firstEnrollment": true,
+      "firstEnrollmentTBC": true,
+      "fwVersion": "6.14.0",
+      "id": 15703,
+      "lastUpdate": "2026-07-10T12:05:06Z",
+      "macAddress": "AA:BB:CC:DD:EE:11",
+      "modelName": "AS35SBBHRA-MW",
+      "nickName": "Dormitorio",
+      "sections": {
+       "chatbot": true,
+       "double_pairing_hidden": true,
+       "epp_enabled": false
+      },
+      "serialNumber": "REDACTED",
+      "series": "s",
+      "seriesVersion": "s",
+      "sfPersonAccountId": "REDACTED",
+      "topics": {
+       "publish": [],
+       "subscribe": [
+        "$aws/events/presence/disconnected/AA:BB:CC:DD:EE:11",
+        "$aws/events/presence/connected/AA:BB:CC:DD:EE:11",
+        "haier/things/AA:BB:CC:DD:EE:11/event/appliancestatus/update",
+        "haier/things/AA:BB:CC:DD:EE:11/event/discovery/update"
+       ]
+      },
+      "unitConfiguration": "1to2"
+     }
+    ]
+   },
+   "success": true
+  }
+ },
+ "success": true
+}
