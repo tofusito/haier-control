@@ -1,14 +1,20 @@
 # Haier Control
 
-Haier Control is a small, local-first web application for two or more Haier hOn air
-conditioners. It provides a pleasant mobile UI, an authenticated API, and persistent
-on/off timers without depending on Home Assistant at runtime.
+[![CI](https://github.com/tofusito/haier-control/actions/workflows/ci.yml/badge.svg)](https://github.com/tofusito/haier-control/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-3776AB.svg)](pyproject.toml)
+
+A self-hosted, mobile-first dashboard for controlling Haier hOn air conditioners.
+Haier Control is local-first: the UI, API, timers, audit history and encrypted session
+state run on your own machine, while live device communication uses the hOn cloud.
 
 > [!WARNING]
 > The hOn cloud API is private and unofficial. It can change without notice. This project
 > never treats a malformed response or an unconfirmed command as success.
 
 ## What works in v0.1
+
+The default setup uses a mock driver and sends no commands to a real appliance.
 
 - Responsive mobile dashboard with mode-specific visual language, target and room
   temperature, fan, swing, advanced controls, reduced-motion support, and honest stale or
@@ -49,6 +55,8 @@ MockDriver   HaierCloudDriver -> private hOn cloud
 See [architecture](docs/architecture.md), [protocol notes](docs/haier-protocol.md),
 [security](docs/security.md), and [deployment](docs/deployment.md).
 
+For model coverage and known boundaries, see [compatibility](docs/compatibility.md).
+
 ## Local quick start (mock)
 
 ```sh
@@ -74,6 +82,8 @@ bootstrap inside the container instead:
 ```sh
 docker compose exec haier-control haier-control auth
 ```
+
+See [configuration](docs/configuration.md) for the full settings reference.
 
 ### Optional automatic hOn login
 
@@ -154,4 +164,7 @@ pytest
 Haier Control is MIT licensed. It does not copy code from addhOn. Wire-level
 interoperability facts are independently implemented from addhOn's public protocol
 specification and are recorded in [the protocol notes](docs/haier-protocol.md). addhOn
-itself is AGPL-3.0.
+itself is AGPL-3.0. Haier and hOn are trademarks of their respective owners; this project
+is not affiliated with or endorsed by Haier.
+
+Contributors are expected to follow the project's [Code of Conduct](CODE_OF_CONDUCT.md).
