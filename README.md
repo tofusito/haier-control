@@ -41,7 +41,7 @@ The domain and API depend only on a `Driver` contract. `MockDriver` and
 connectors do not change the UI, timers, or local API.
 
 ```text
-mobile web / Hermes
+mobile web / integrations
         |
 authenticated API + SSE
         |
@@ -115,7 +115,7 @@ new browser opens the dashboard without a token prompt. Bearer API tokens remain
 for integrations. The root dashboard and hOn setup flow reject clients outside the listed
 networks; do not enable this mode behind a public reverse proxy or internet tunnel.
 
-If DockerHand owns a root-only Compose file, the same setting can be persisted in the
+If a host-managed root-only Compose file owns the service, the same setting can be persisted in the
 dedicated `/data/haier-trusted-network.conf` file (mode `0600`):
 
 ```text
@@ -143,7 +143,7 @@ The process imports them into its encrypted recovery file, clears temporary refe
 and never logs their contents. Back up `/data` and the master key separately.
 
 For a hobby installation that accepts a weaker host-side boundary, set both
-`HAIER_HON_EMAIL` and `HAIER_HON_PASSWORD`. Docker inspect, DockerHand, Compose output, and
+`HAIER_HON_EMAIL` and `HAIER_HON_PASSWORD`. Docker inspect, Compose output, and
 host administrators can read direct environment values in clear text. Haier Control never
 prints them, but cannot hide them from Docker. Do not combine direct values with file mode;
 the complete file pair wins.

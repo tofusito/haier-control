@@ -13,7 +13,7 @@
       HAIER_HON_EMAIL_FILE: /run/secrets/haier_hon_email
       HAIER_HON_PASSWORD_FILE: /run/secrets/haier_hon_password
       # Convenience alternative: HAIER_HON_EMAIL / HAIER_HON_PASSWORD. Direct
-      # values are visible in Docker inspect and DockerHand; do not use both modes.
+      # values are visible in Docker inspect; do not use both modes.
     volumes:
       - <RUNTIME_ROOT>/data:/data
       - <RUNTIME_ROOT>/secrets/master_key:/run/secrets/haier_control_master_key:ro

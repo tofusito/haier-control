@@ -9,7 +9,7 @@ def load_runtime_config(settings: Settings) -> Settings:
     """Load the optional host-only trusted-network switch.
 
     The marker exists for deployments whose Compose file is managed by another
-    administrator (for example a root-owned DockerHand stack). It contains no
+administrator (for example a root-owned host stack). It contains no
     secret and is ignored when an operator explicitly supplied either trusted
     setting through the environment or constructor.
     """

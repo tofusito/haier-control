@@ -30,7 +30,7 @@ Automatic authentication is opt-in. A reusable encrypted session always wins. Wi
 mode, both credential files must be regular `0600` files mounted read-only; they are read
 at startup to update the encrypted recovery copy. Direct `HAIER_HON_EMAIL` and
 `HAIER_HON_PASSWORD` variables are a convenience mode and remain visible in the container
-configuration to Docker, DockerHand, and host administrators. File mode wins over direct
+configuration to Docker and host administrators. File mode wins over direct
 variables, and any incomplete or unsafe pair fails closed to the interactive UI without a
 immediate retry loop. Recovery first refreshes the saved token, then uses saved credentials
 only when refresh is rejected. Concurrent renewals share a lock; failed attempts back off
@@ -68,7 +68,7 @@ from a different network, while the trusted cookie grants only the normal `read`
 `control`, and `timers` scopes. Keep the service off public reverse proxies and tunnels;
 if a proxy must exist, keep it outside the trusted CIDRs or retain protected mode.
 
-For root-owned DockerHand Compose files, the opt-in can be stored as the `0600` marker
+For root-owned Compose files, the opt-in can be stored as the `0600` marker
 `/data/haier-trusted-network.conf` with `mode=trusted` and a comma-separated `cidrs=`
 line. It contains no secret and can be removed to restore bearer-token browser access.
 

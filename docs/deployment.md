@@ -20,7 +20,7 @@ explicit comma-separated `HAIER_TRUSTED_NETWORK_CIDRS` value containing the home
 Tailscale ranges. The browser gets a signed `HttpOnly` session cookie without receiving an
 API token; bearer tokens remain available to integrations. The service must stay bound to
 the selected home/Tailscale reachability and must not be placed behind a public proxy or
-tunnel. If DockerHand owns a root-only Compose file, persist the opt-in in
+tunnel. If a host-managed root-only Compose file owns the service, persist the opt-in in
 `/data/haier-trusted-network.conf` (mode `0600`) with `mode=trusted` and `cidrs=...`.
 The application validates this marker before starting and fails closed on missing or
 invalid networks.
@@ -41,14 +41,14 @@ script:
 8. on any failure, restores the prior image ID and recreates or removes only
    `haier-control`.
 
-The initial insertion of the service into a root-owned DockerHand stack remains a separate,
+The initial insertion of the service into a root-owned host stack remains a separate,
 explicitly reviewed action. Do not run the deploy script before the Compose fragment,
 volume, and secret exist.
 
 For recommended automatic login, create `secrets/hon_email` and `secrets/hon_password`
 interactively on the host with mode `0600`, then add the two `_FILE` variables and
 read-only bind mounts from `deploy/homelab-service.template.yaml`. Never paste their values
-into DockerHand. Removing those four Compose lines no longer disables automatic recovery:
+into a shared Compose file or deployment dashboard. Removing those four Compose lines no longer disables automatic recovery:
 the encrypted copy in `/data/haier-credentials.enc` remains available. To intentionally
 disable password recovery, remove the configured credential inputs and that encrypted
 recovery file, preserving `/data/haier-session.enc` and the master key. Existing sessions
