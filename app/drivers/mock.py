@@ -34,21 +34,24 @@ class MockDriver:
             horizontal_swing=["fixed", "swing"],
             advanced=[
                 AdvancedCapability(key="eco", label="Eco", kind="toggle"),
-                AdvancedCapability(key="sleep", label="Sueño", kind="toggle"),
+                AdvancedCapability(key="sleep", label="Sleep", kind="toggle"),
                 AdvancedCapability(key="rapid", label="Turbo", kind="toggle"),
                 AdvancedCapability(key="display", label="Display", kind="toggle"),
                 AdvancedCapability(key="health", label="Health", kind="toggle"),
-                AdvancedCapability(key="mute", label="Silencio", kind="toggle"),
+                AdvancedCapability(key="mute", label="Mute", kind="toggle"),
             ],
         )
         self._devices = {
             "salon": DeviceSummary(
-                id="salon", name="Salón", model="Haier AC (simulado)", capabilities=capabilities
+                id="salon",
+                name="Living room",
+                model="Haier AC (simulated)",
+                capabilities=capabilities,
             ),
             "dormitorio": DeviceSummary(
                 id="dormitorio",
-                name="Dormitorio",
-                model="Haier AC (simulado)",
+                name="Bedroom",
+                model="Haier AC (simulated)",
                 capabilities=capabilities,
             ),
         }

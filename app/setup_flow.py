@@ -160,7 +160,7 @@ class SetupFlowManager:
                     flow_id=self._automatic_flow_id,
                     csrf_token=flow.csrf_token,
                     expires_in=max(0, int(flow.expires_at - time.monotonic())),
-                    message="Introduce el código que hOn envió por correo.",
+                    message="Enter the code hOn sent by email.",
                 )
             self._automatic_flow_id = None
         if self._automatic_failure:
@@ -173,7 +173,7 @@ class SetupFlowManager:
             return HaierSetupStatusResponse(
                 status="complete",
                 api_token=token,
-                message="La sesión hOn está disponible.",
+                message="The hOn session is available.",
             )
         return HaierSetupStatusResponse(status="manual")
 

@@ -33,7 +33,11 @@ async def test_interactive_login_uses_compatible_salesforce_user_agent() -> None
         (HaierPairingTokenError("expired"), status.HTTP_400_BAD_REQUEST, "pairing_token"),
         (HaierProtocolError("schema"), status.HTTP_502_BAD_GATEWAY, "protocol"),
         (httpx.ConnectError("offline"), status.HTTP_502_BAD_GATEWAY, "network"),
-        (HaierAuthenticationError("rejected"), status.HTTP_400_BAD_REQUEST, "authentication"),
+        (
+            HaierAuthenticationError("private-vendor-login-error"),
+            status.HTTP_400_BAD_REQUEST,
+            "authentication",
+        ),
         (RuntimeError("unexpected"), status.HTTP_500_INTERNAL_SERVER_ERROR, "unexpected"),
     ],
 )

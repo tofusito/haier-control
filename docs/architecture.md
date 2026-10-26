@@ -78,6 +78,8 @@ Each timer has a local idempotency key, audit history, execution timestamp, and 
 
 ## Realtime
 
-SSE carries local device/timer changes to open browsers. REST polling is the planned
-authoritative reconciliation path for the cloud driver. AWS IoT MQTT is intentionally
-not enabled in v0.1; adding it belongs inside `HaierCloudDriver`, not in the API or UI.
+SSE carries local device/timer changes to open browsers. Cloud state is read over REST
+on request (initial load, manual refresh and reconciliation after app actions). There is
+no continuous background state poll; `poll_interval_seconds` is currently reserved.
+Physical-remote changes may therefore need a manual refresh. AWS IoT MQTT is not enabled
+in v0.1; adding it belongs inside `HaierCloudDriver`, not in the API or UI.

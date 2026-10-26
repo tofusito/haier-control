@@ -46,20 +46,20 @@ FAN_FROM_RAW = {"5": "auto", "3": "low", "2": "medium", "1": "high"}
 RAW_FROM_FAN = {value: key for key, value in FAN_FROM_RAW.items()}
 ADVANCED = {
     "eco": ("echoStatus", "Eco"),
-    "sleep": ("silentSleepStatus", "Sueño"),
+    "sleep": ("silentSleepStatus", "Sleep"),
     "rapid": ("rapidMode", "Turbo"),
     "health": ("healthMode", "Health"),
     "display": ("screenDisplayStatus", "Display"),
-    "mute": ("muteStatus", "Silencio"),
-    "fresh_air": ("freshAirStatus", "Aire fresco"),
-    "child_lock": ("lockStatus", "Bloqueo infantil"),
-    "light": ("lightStatus", "Luz"),
-    "presence": ("humanSensingStatus", "Presencia"),
-    "self_clean": ("selfCleaningStatus", "Autolimpieza"),
-    "self_clean_56": ("selfCleaning56Status", "Autolimpieza 56 °C"),
-    "ten_degree_heat": ("10degreeHeatingStatus", "Calefacción a 10 °C"),
-    "electric_heat": ("electricHeatingStatus", "Calefacción eléctrica"),
-    "half_degree": ("halfDegreeSettingStatus", "Medio grado"),
+    "mute": ("muteStatus", "Mute"),
+    "fresh_air": ("freshAirStatus", "Fresh air"),
+    "child_lock": ("lockStatus", "Child lock"),
+    "light": ("lightStatus", "Light"),
+    "presence": ("humanSensingStatus", "Presence sensing"),
+    "self_clean": ("selfCleaningStatus", "Self-cleaning"),
+    "self_clean_56": ("selfCleaning56Status", "Self-cleaning 56 °C"),
+    "ten_degree_heat": ("10degreeHeatingStatus", "10 °C heating"),
+    "electric_heat": ("electricHeatingStatus", "Electric heating"),
+    "half_degree": ("halfDegreeSettingStatus", "Half-degree steps"),
 }
 
 
@@ -106,7 +106,7 @@ def _number(value: Any) -> float | None:
 class HaierCloudDriver:
     """Direct adapter for the private hOn API.
 
-    MQTT is deliberately not enabled in v0.1. REST polling is the authoritative
+    MQTT is deliberately not enabled in v0.1. On-demand REST reads are the authoritative
     reconciliation path and every cloud/schema failure remains visible to callers.
     """
 

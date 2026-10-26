@@ -68,40 +68,39 @@ def _setup_failure(exc: Exception) -> tuple[int, str, str]:
     if isinstance(exc, HaierPairingTokenError):
         return (
             status.HTTP_400_BAD_REQUEST,
-            "El token de emparejamiento no es válido o ya se usó. Solicita uno nuevo.",
+            "The pairing token is invalid or has already been used. Request a new one.",
             "pairing_token",
         )
     if isinstance(exc, HaierLoginNotAccepted):
         return (
             status.HTTP_400_BAD_REQUEST,
-            "Salesforce ejecutó el login pero no devolvió el redirect esperado. Las "
-            "credenciales pueden ser correctas; usa el fallback interactivo y revisa "
-            "la compatibilidad del flujo antes de reintentar.",
+            "hOn did not complete the expected sign-in redirect. Your credentials may "
+            "still be correct. Try interactive sign-in and check authentication "
+            "compatibility before trying again.",
             "login_not_accepted",
         )
     if isinstance(exc, HaierProtocolError):
         return (
             status.HTTP_502_BAD_GATEWAY,
-            "hOn cambió temporalmente su flujo de acceso. No se enviaron las credenciales; "
-            "actualiza Haier Control o inténtalo más tarde.",
+            "The hOn sign-in flow has changed. Update Haier Control or try again later.",
             "protocol",
         )
     if isinstance(exc, httpx.HTTPError):
         return (
             status.HTTP_502_BAD_GATEWAY,
-            "No se pudo contactar con hOn. Comprueba la conexión y vuelve a intentarlo.",
+            "Could not reach hOn. Check your connection and try again.",
             "network",
         )
     if isinstance(exc, HaierAuthenticationError):
         return (
             status.HTTP_400_BAD_REQUEST,
-            "hOn rechazó el acceso o devolvió una respuesta inesperada. Comprueba primero "
-            "las credenciales en la app oficial y vuelve a intentarlo con un token nuevo.",
+            "hOn rejected the login or returned an unexpected response. Check your "
+            "credentials in the official app, then try again with a new pairing token.",
             "authentication",
         )
     return (
         status.HTTP_500_INTERNAL_SERVER_ERROR,
-        "El acceso a hOn falló antes de completarse. Genera un token nuevo y vuelve a intentarlo.",
+        "hOn sign-in did not complete. Generate a new pairing token and try again.",
         "unexpected",
     )
 
@@ -172,8 +171,8 @@ def create_app(
                         await setup_manager.begin_automatic(saved["email"], saved["password"])
             except AutomaticCredentialError as exc:
                 detail = (
-                    "La autenticación automática está mal configurada. Corrige ambos "
-                    "secretos privados o usa el pairing manual."
+                    "Automatic authentication is misconfigured. Check both private "
+                    "credential files or use manual pairing."
                 )
                 setup_manager.set_automatic_failure(detail)
                 _LOGGER.warning(

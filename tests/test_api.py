@@ -46,7 +46,7 @@ async def test_trusted_network_browser_session_needs_no_bearer_token(
     assert "haier_trusted_session=" in root.headers["set-cookie"]
     assert health.json()["trusted_network"] is True
     assert devices.status_code == 200
-    assert devices.json()[0]["name"] == "Salón"
+    assert devices.json()[0]["name"] == "Living room"
 
 
 @pytest.mark.asyncio
@@ -113,7 +113,7 @@ async def test_devices_are_capability_based(
     response = await client.get("/api/v1/devices", headers=headers)
     assert response.status_code == 200
     devices = response.json()
-    assert [item["name"] for item in devices] == ["Salón", "Dormitorio"]
+    assert [item["name"] for item in devices] == ["Living room", "Bedroom"]
     assert "cool" in devices[0]["capabilities"]["modes"]
     assert devices[0]["state"]["room_temperature"] is not None
 

@@ -41,10 +41,10 @@
     const mode = device.state.mode || "auto";
     return {
       pressed: on,
-      label: on ? "Encendido" : "Apagado",
-      ariaLabel: on ? `Apagar ${device.name}` : `Encender ${device.name}`,
-      caption: `${on ? "Encendido" : "Apagado"} · ${mode}`,
-      status: pending ? "Sincronizando…" : "",
+      label: on ? "On" : "Off",
+      ariaLabel: on ? `Turn off ${device.name}` : `Turn on ${device.name}`,
+      caption: `${on ? "On" : "Off"} · ${mode}`,
+      status: pending ? "Syncing…" : "",
     };
   }
 
@@ -152,7 +152,7 @@
         }
         if (!result?.accepted) {
           restore(device);
-          toast(result?.message || "El cambio no fue aceptado");
+          toast(result?.message || "The change was not accepted");
           return { status: "rejected", result };
         }
         if (result.state) device.state = result.state;
@@ -163,20 +163,20 @@
         state.optimisticSnapshots.delete(deviceId);
         state.pendingCommands.delete(deviceId);
         showError(""); render();
-        toast("Cambio confirmado");
+        toast("Change confirmed");
         queueRefresh(1200);
         return { status: "accepted", result };
       } catch (error) {
         restore(device);
         if (timedOut || error?.name === "AbortError") {
-          showError("No se pudo confirmar el cambio. Puedes reintentarlo.");
-          toast("Sin confirmar · puedes reintentar");
+          showError("Could not confirm the change. Please try again.");
+          toast("Unconfirmed · try again");
           queueRefresh(1200);
           return { status: "timeout", error };
         }
-        const detail = error?.message || "No se pudo aplicar el cambio";
-        showError(`${detail}. Puedes reintentarlo.`);
-        toast("No se pudo aplicar · reintenta");
+        const detail = error?.message || "Could not apply the change";
+        showError(`${detail}. Please try again.`);
+        toast("Could not apply · try again");
         return { status: "failed", error };
       } finally {
         clearTimer(timeoutId);

@@ -11,16 +11,16 @@ const REQUEST_TIMEOUT_MS = 10000;
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const modeMeta = {
-  auto: ["Auto", "◇"], cool: ["Frío", "❄"], heat: ["Calor", "☀"],
-  dry: ["Seco", "◌"], fan: ["Ventilador", "✣"], off: ["Apagado", "○"]
+  auto: ["Auto", "◇"], cool: ["Cool", "❄"], heat: ["Heat", "☀"],
+  dry: ["Dry", "◌"], fan: ["Fan", "✣"], off: ["Off", "○"]
 };
-const labels = { auto:"Auto", cool:"Frío", heat:"Calor", dry:"Seco", fan:"Ventilador", low:"Bajo", medium:"Medio", high:"Alto", swing:"Oscilar", fixed:"Fijo" };
+const labels = { auto:"Auto", cool:"Cool", heat:"Heat", dry:"Dry", fan:"Fan", low:"Low", medium:"Medium", high:"High", swing:"Swing", fixed:"Fixed" };
 
 async function api(path, options = {}) {
   const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
   if (state.token && !state.trustedNetwork) headers.Authorization = `Bearer ${state.token}`;
   const response = await fetch(path, { ...options, headers, credentials: "same-origin" });
-  if (response.status === 401) { openTokenDialog("El token no es válido o ha sido revocado."); throw new Error("unauthorized"); }
+  if (response.status === 401) { openTokenDialog("The token is invalid or has been revoked."); throw new Error("unauthorized"); }
   let body = null;
   if (response.headers.get("content-type")?.includes("json")) body = await response.json();
   if (!response.ok) throw new Error(body?.detail || `Error ${response.status}`);
@@ -30,7 +30,7 @@ async function api(path, options = {}) {
 function escapeHtml(value) { const element = document.createElement("span"); element.textContent = String(value ?? ""); return element.innerHTML; }
 function showError(message) { const banner = $("#errorBanner"); banner.textContent = message; banner.classList.toggle("hidden", !message); }
 function toast(message) { const node = $("#toast"); node.textContent = message; node.classList.add("show"); clearTimeout(toast.timer); toast.timer = setTimeout(() => node.classList.remove("show"), 2600); }
-function localTime(value) { return new Intl.DateTimeFormat("es-ES", { hour:"2-digit", minute:"2-digit" }).format(new Date(value)); }
+function localTime(value) { return new Intl.DateTimeFormat("en-GB", { hour:"2-digit", minute:"2-digit" }).format(new Date(value)); }
 function countdown(value) {
   const seconds = Math.max(0, Math.floor((new Date(value).getTime() - Date.now()) / 1000));
   if (seconds < 60) return `${seconds} s`;
@@ -55,11 +55,11 @@ function renderSwitcher() {
   root.innerHTML = `<div class="device-switcher-track">${state.devices.map(device => {
     const selected = device.id === state.selectedDeviceId;
     const mode = cardMode(device); const [modeLabel, glyph] = modeMeta[mode] || [mode, "·"];
-    const power = device.state.power ? "Encendido" : "Apagado";
+    const power = device.state.power ? "On" : "Off";
     return `<button class="device-tab ${selected ? "active" : ""}" type="button" data-device-select="${device.id}" aria-pressed="${selected}">
       <span class="device-tab-head"><span>${escapeHtml(device.name)}</span><span class="device-tab-glyph">${glyph}</span></span>
-      <span class="device-tab-meta"><span>${power} · ${escapeHtml(modeLabel)}</span><strong>${formatTemperature(device.state.target_temperature)}°</strong></span>
-      <small>${device.state.room_temperature == null ? "Ambiente —" : `Ambiente ${formatTemperature(device.state.room_temperature)}°`}</small>
+      <span class="device-tab-meta"><span>${power}${device.state.power ? ` · ${escapeHtml(modeLabel)}` : ""}</span><strong>${formatTemperature(device.state.target_temperature)}°</strong></span>
+      <small>${device.state.room_temperature == null ? "Room —" : `Room ${formatTemperature(device.state.room_temperature)}°`}</small>
     </button>`;
   }).join("")}</div>`;
   $$('[data-device-select]', root).forEach(button => button.addEventListener("click", () => {
@@ -73,7 +73,7 @@ function renderSwitcher() {
 function render() {
   const root = $("#devices");
   renderSwitcher();
-  if (!state.devices.length) { root.innerHTML = `<div class="banner">No hay aires anunciados por el adaptador actual.</div>`; return; }
+  if (!state.devices.length) { root.innerHTML = `<div class="banner">No air conditioners were reported by the current driver.</div>`; return; }
   root.innerHTML = state.devices.map(deviceCard).join("");
   bindCards();
 }
@@ -84,26 +84,26 @@ function deviceCard(device) {
   const pending = state.pendingCommands.has(device.id);
   const disabled = pending ? " disabled" : "";
   const power = window.HaierUiState.presentPowerState(device, pending);
-  const roomTemp = device.state.room_temperature == null ? "Sin dato de ambiente" : `Habitación ${formatTemperature(device.state.room_temperature)}°`;
+  const roomTemp = device.state.room_temperature == null ? "Room temperature unavailable" : `Room ${formatTemperature(device.state.room_temperature)}°`;
   const target = formatTemperature(device.state.target_temperature);
   const modeChips = caps.modes.map(item => `<button class="chip ${device.state.mode === item ? "active" : ""}" data-command="set_mode" data-value="${item}"${disabled}>${escapeHtml(labels[item] || item)}</button>`).join("");
   const fanChips = caps.fan_modes.map(item => `<button class="chip ${device.state.fan_mode === item ? "active" : ""}" data-command="set_fan" data-value="${item}"${disabled}>${escapeHtml(labels[item] || item)}</button>`).join("");
   const timerPending = Boolean(timer && state.timerMutations.has(timer.id));
   const timerButtonDisabled = timerPending ? " disabled" : "";
   const timerHtml = timerPending
-    ? `<span><strong>Sincronizando temporizador…</strong><small>${localTime(timer.execute_at)}</small></span><span class="timer-pulse"></span>`
+    ? `<span><strong>Syncing timer…</strong><small>${localTime(timer.execute_at)}</small></span><span class="timer-pulse"></span>`
     : timer
-      ? `<span><strong>${timer.action === "on" ? "Encender" : "Apagar"} en <span data-countdown="${timer.execute_at}">${countdown(timer.execute_at)}</span></strong><small>${localTime(timer.execute_at)} · toca para editar</small></span><span class="timer-pulse"></span>`
-      : `<span><strong>Temporizador</strong><small>Encender o apagar después</small></span><span>＋</span>`;
+      ? `<span><strong>${timer.action === "on" ? "Turn on" : "Turn off"} in <span data-countdown="${timer.execute_at}">${countdown(timer.execute_at)}</span></strong><small>${localTime(timer.execute_at)} · tap to edit</small></span><span class="timer-pulse"></span>`
+      : `<span><strong>Timer</strong><small>Schedule power on or off</small></span><span>＋</span>`;
   return `<article class="device-card ${mode} ${device.id === state.selectedDeviceId ? "selected" : ""} ${pending ? "pending" : ""}" data-device="${device.id}" aria-busy="${pending}">
     <div class="card-content">
-      <div class="card-head"><div><div class="room-name">${escapeHtml(device.name)}</div><div class="mode-caption"><span class="mode-glyph">${glyph}</span><span>${power.label} · ${modeLabel}${device.state.stale ? " · dato antiguo" : ""}</span></div>${pending ? `<div class="sync-status" role="status" aria-live="polite"><span class="sync-spinner" aria-hidden="true"></span>${power.status}</div>` : ""}</div>
+      <div class="card-head"><div><div class="room-name">${escapeHtml(device.name)}</div><div class="mode-caption"><span class="mode-glyph">${glyph}</span><span>${power.label}${device.state.power ? ` · ${modeLabel}` : ""}${device.state.stale ? " · stale data" : ""}</span></div>${pending ? `<div class="sync-status" role="status" aria-live="polite"><span class="sync-spinner" aria-hidden="true"></span>${power.status}</div>` : ""}</div>
       <button class="power" type="button" data-power aria-pressed="${power.pressed}" aria-label="${escapeHtml(power.ariaLabel)}"${disabled}><span class="power-symbol" aria-hidden="true">⏻</span></button></div>
       <div class="temperature-block"><div><div class="target-temp">${target}<sup>°</sup></div><div class="room-temp">${roomTemp}</div></div></div>
-      ${caps.temperature_min != null ? `<div class="temp-controls"><button data-temp="down" aria-label="Bajar temperatura"${disabled}>−</button><button data-temp="up" aria-label="Subir temperatura"${disabled}>＋</button></div>` : ""}
-      ${modeChips ? `<div class="control-section"><div class="control-label"><span>Modo</span><span>${modeLabel}</span></div><div class="chips">${modeChips}</div></div>` : ""}
-      ${fanChips ? `<div class="control-section"><div class="control-label"><span>Ventilador</span><span>${escapeHtml(labels[device.state.fan_mode] || device.state.fan_mode || "—")}</span></div><div class="chips">${fanChips}</div></div>` : ""}
-      <div class="actions"><button class="control-button timer-summary" data-timer${timerButtonDisabled}>${timerHtml}</button><button class="control-button" data-more aria-label="Más controles"${disabled}>•••</button></div>
+      ${caps.temperature_min != null ? `<div class="temp-controls"><button data-temp="down" aria-label="Decrease temperature"${disabled}>−</button><button data-temp="up" aria-label="Increase temperature"${disabled}>＋</button></div>` : ""}
+      ${modeChips ? `<div class="control-section"><div class="control-label"><span>Mode</span><span>${modeLabel}</span></div><div class="chips">${modeChips}</div></div>` : ""}
+      ${fanChips ? `<div class="control-section"><div class="control-label"><span>Fan</span><span>${escapeHtml(labels[device.state.fan_mode] || device.state.fan_mode || "—")}</span></div><div class="chips">${fanChips}</div></div>` : ""}
+      <div class="actions"><button class="control-button timer-summary" data-timer${timerButtonDisabled}>${timerHtml}</button><button class="control-button" data-more aria-label="More controles"${disabled}>•••</button></div>
     </div></article>`;
 }
 
@@ -133,7 +133,7 @@ function openTimer(device) {
   $("#timerDeviceId").value = device.id; $("#timerEditId").value = timer?.id || "";
   $("#timerError").textContent = "";
   $("#deleteTimerButton").classList.toggle("hidden", !timer);
-  $("#timerTitle").textContent = timer ? `Editar · ${device.name}` : `Programar · ${device.name}`;
+  $("#timerTitle").textContent = timer ? `Edit · ${device.name}` : `Schedule · ${device.name}`;
   if (timer) {
     $(`input[name=timerAction][value=${timer.action}]`).checked = true;
     $("input[name=timerKind][value=exact]").checked = true;
@@ -144,7 +144,7 @@ function openTimer(device) {
   $("#timerMode").value = timer?.command?.mode || device.state.mode || caps.modes[0] || "auto";
   $("#timerTemperature").min = caps.temperature_min ?? ""; $("#timerTemperature").max = caps.temperature_max ?? ""; $("#timerTemperature").step = caps.temperature_step ?? 1;
   $("#timerTemperature").value = timer?.command?.temperature ?? device.state.target_temperature ?? caps.temperature_min ?? 22;
-  $("#timerFan").innerHTML = `<option value="">Sin cambiar</option>` + caps.fan_modes.map(item => `<option value="${item}">${labels[item] || item}</option>`).join("");
+  $("#timerFan").innerHTML = `<option value="">Keep current</option>` + caps.fan_modes.map(item => `<option value="${item}">${labels[item] || item}</option>`).join("");
   $("#timerFan").value = timer?.command?.fan_mode || "";
   syncTimerFields(); dialog.showModal();
 }
@@ -159,7 +159,7 @@ async function saveTimer(event) {
   event.preventDefault(); const deviceId = $("#timerDeviceId").value, editId = $("#timerEditId").value;
   const action = $("input[name=timerAction]:checked").value, exact = $("input[name=timerKind]:checked").value === "exact";
   const executeAt = exact ? new Date($("#timerExact").value) : new Date(Date.now() + Number($("#timerMinutes").value)*60000);
-  if (Number.isNaN(executeAt.getTime()) || executeAt <= new Date()) { $("#timerError").textContent = "Elige una hora futura."; return; }
+  if (Number.isNaN(executeAt.getTime()) || executeAt <= new Date()) { $("#timerError").textContent = "Choose a time in the future."; return; }
   const command = action === "on" ? { mode:$("#timerMode").value, temperature:Number($("#timerTemperature").value), ...($("#timerFan").value ? {fan_mode:$("#timerFan").value} : {}) } : {};
   const original = editId ? state.timers.find(item => item.id === editId) : null;
   const localId = editId || temporaryTimerId();
@@ -171,21 +171,21 @@ async function saveTimer(event) {
   };
   state.timerMutations.set(localId, { kind: "save", optimistic, original });
   state.timers = state.timers.filter(item => item.id !== localId && item.id !== editId).concat(optimistic);
-  $("#timerDialog").close(); render(); toast("Guardando temporizador…");
+  $("#timerDialog").close(); render(); toast("Saving timer…");
   try {
     const saved = editId
       ? await apiWithTimeout(`/api/v1/timers/${editId}`, { method:"PATCH", body:JSON.stringify({ execute_at:executeAt.toISOString(), command }) })
       : await apiWithTimeout("/api/v1/timers", { method:"POST", body:JSON.stringify({ device_id:deviceId, action, execute_at:executeAt.toISOString(), command, idempotency_key:localId }) });
     state.timerMutations.delete(localId);
     state.timers = state.timers.filter(item => item.id !== localId && item.id !== saved.id).concat(saved);
-    showError(""); render(); toast(editId ? "Temporizador actualizado" : "Temporizador programado");
+    showError(""); render(); toast(editId ? "Timer updated" : "Timer scheduled");
   } catch (error) {
     state.timerMutations.delete(localId);
     state.timers = state.timers.filter(item => item.id !== localId);
     if (original) state.timers.push(original);
     render();
-    if (error.timedOut) { showError("No se pudo confirmar el temporizador. Puedes reintentarlo."); toast("Temporizador sin confirmar · reintenta"); }
-    else showError(error.message || "No se pudo guardar el temporizador. Puedes reintentarlo.");
+    if (error.timedOut) { showError("Could not confirm the timer. Please try again."); toast("Timer unconfirmed · try again"); }
+    else showError(error.message || "Could not save the timer. Please try again.");
   }
 }
 
@@ -214,43 +214,43 @@ async function apiWithTimeout(path, options = {}) {
 
 async function deleteTimer() {
   const timerId = $("#timerEditId").value;
-  if (!timerId || !window.confirm("¿Eliminar este temporizador?")) return;
+  if (!timerId || !window.confirm("Delete this timer?")) return;
   const original = state.timers.find(item => item.id === timerId);
   if (!original) return;
   const optimistic = { ...original, status: "cancelled", updated_at: new Date().toISOString() };
   state.timerMutations.set(timerId, { kind: "delete", optimistic, original });
   state.timers = state.timers.filter(item => item.id !== timerId).concat(optimistic);
   const button = $("#deleteTimerButton"); button.disabled = true;
-  $("#timerDialog").close(); render(); toast("Eliminando temporizador…");
+  $("#timerDialog").close(); render(); toast("Deleting timer…");
   try {
     const deleted = await apiWithTimeout(`/api/v1/timers/${timerId}`, { method:"DELETE" });
     state.timerMutations.delete(timerId);
     state.timers = state.timers.filter(item => item.id !== deleted.id).concat(deleted);
-    render(); toast("Temporizador eliminado");
+    render(); toast("Timer deleted");
   } catch (error) {
     state.timerMutations.delete(timerId);
     state.timers = state.timers.filter(item => item.id !== timerId).concat(original);
     render();
-    if (error.timedOut) { showError("No se pudo confirmar la eliminación. Puedes reintentarlo."); toast("Eliminación sin confirmar · reintenta"); }
-    else showError(error.message || "No se pudo eliminar el temporizador. Puedes reintentarlo.");
+    if (error.timedOut) { showError("Could not confirm deletion. Please try again."); toast("Deletion unconfirmed · try again"); }
+    else showError(error.message || "Could not delete the timer. Please try again.");
   }
   finally { button.disabled = false; }
 }
 
 function openMore(device) {
-  $("#moreTitle").textContent = `Más · ${device.name}`; const root = $("#advancedControls");
+  $("#moreTitle").textContent = `More · ${device.name}`; const root = $("#advancedControls");
   const rows = [];
-  if (device.capabilities.vertical_swing.length) rows.push(selectRow("Swing vertical", "set_vertical_swing", device.capabilities.vertical_swing, device.state.vertical_swing));
-  if (device.capabilities.horizontal_swing.length) rows.push(selectRow("Swing horizontal", "set_horizontal_swing", device.capabilities.horizontal_swing, device.state.horizontal_swing));
+  if (device.capabilities.vertical_swing.length) rows.push(selectRow("Vertical swing", "set_vertical_swing", device.capabilities.vertical_swing, device.state.vertical_swing));
+  if (device.capabilities.horizontal_swing.length) rows.push(selectRow("Horizontal swing", "set_horizontal_swing", device.capabilities.horizontal_swing, device.state.horizontal_swing));
   device.capabilities.advanced.forEach(item => {
     if (item.kind === "toggle") rows.push(`<div class="advanced-row"><span>${escapeHtml(item.label)}</span><button class="switch" type="button" aria-pressed="${Boolean(device.state.advanced[item.key])}" data-advanced="${item.key}" aria-label="${escapeHtml(item.label)}"></button></div>`);
   });
-  root.innerHTML = rows.join("") || `<p class="muted">Este modelo no anuncia controles avanzados.</p>`;
+  root.innerHTML = rows.join("") || `<p class="muted">This model does not report advanced controls.</p>`;
   $$('[data-advanced]', root).forEach(button => button.addEventListener("click", () => { $("#moreDialog").close(); void send(device.id, "set_advanced", button.getAttribute("aria-pressed") !== "true", button.dataset.advanced); }));
   $$('[data-more-command]', root).forEach(select => select.addEventListener("change", () => { $("#moreDialog").close(); void send(device.id, select.dataset.moreCommand, select.value); }));
   $("#moreDialog").showModal();
 }
-function selectRow(label, command, options, selected) { return `<div class="advanced-row"><label>${label}<select data-more-command="${command}">${options.map(value => `<option value="${value}" ${value === selected ? "selected" : ""}>${escapeHtml(labels[value] || value.replace("position_","Posición "))}</option>`).join("")}</select></label></div>`; }
+function selectRow(label, command, options, selected) { return `<div class="advanced-row"><label>${label}<select data-more-command="${command}">${options.map(value => `<option value="${value}" ${value === selected ? "selected" : ""}>${escapeHtml(labels[value] || value.replace("position_","Position "))}</option>`).join("")}</select></label></div>`; }
 
 function openTokenDialog(message = "") { $("#tokenError").textContent = message; if (!$("#tokenDialog").open) $("#tokenDialog").showModal(); }
 async function saveToken(event) {
@@ -273,7 +273,7 @@ async function saveHaierSetup(event) {
       if (result.status === "mfa_required") {
         state.setupFlow = { id:result.flow_id, csrf:result.csrf_token };
         $("#credentialsStep").classList.add("hidden"); $("#otpStep").classList.remove("hidden");
-        $("#setupEyebrow").textContent = "DOBLE FACTOR"; $("#setupTitle").textContent = "Revisa tu correo"; $("#haierSetupSubmit").textContent = "Verificar y conectar"; $("#haierOtp").focus(); return;
+        $("#setupEyebrow").textContent = "TWO-FACTOR VERIFICATION"; $("#setupTitle").textContent = "Check your email"; $("#haierSetupSubmit").textContent = "Verify and connect"; $("#haierOtp").focus(); return;
       }
     } else {
       result = await api("/api/v1/setup/haier/otp", { method:"POST", body:JSON.stringify({ flow_id:state.setupFlow.id, csrf_token:state.setupFlow.csrf, code:$("#haierOtp").value }) });
@@ -282,8 +282,8 @@ async function saveHaierSetup(event) {
     if (result.status === "complete") {
       state.setupFlow = null;
       if (result.api_token && !state.trustedNetwork) { await rememberSetupToken(result.api_token); }
-      $("#haierSetupDialog").close(); toast("hOn conectado");
-      if (window.HaierUiState.needsLocalToken(state)) openTokenDialog("Conexión hOn completada; introduce tu token local.");
+      $("#haierSetupDialog").close(); toast("Connected to hOn");
+      if (window.HaierUiState.needsLocalToken(state)) openTokenDialog("Connected to hOn. Enter your local API token.");
       else { await refresh(); connectEvents(); }
     }
   } catch (error) { $("#haierPassword").value = ""; errorNode.textContent = error.message; }
@@ -291,7 +291,7 @@ async function saveHaierSetup(event) {
 
 async function resendOtp() {
   if (!state.setupFlow) return;
-  try { await api("/api/v1/setup/haier/resend", { method:"POST", body:JSON.stringify({ flow_id:state.setupFlow.id, csrf_token:state.setupFlow.csrf }) }); toast("Código reenviado"); }
+  try { await api("/api/v1/setup/haier/resend", { method:"POST", body:JSON.stringify({ flow_id:state.setupFlow.id, csrf_token:state.setupFlow.csrf }) }); toast("Code resent"); }
   catch (error) { $("#haierSetupError").textContent = error.message; }
 }
 
@@ -302,8 +302,8 @@ async function refresh() {
     try {
       const [devices, timers] = await Promise.all([api("/api/v1/devices"), api("/api/v1/timers?include_finished=true")]);
       state.devices = commandController.reconcileDevices(devices);
-      state.timers = window.HaierUiState.mergeTimerMutations(timers, state.timerMutations); showError(""); render(); setConnection(true, "En línea");
-    } catch (error) { if (error.message !== "unauthorized") { showError(error.message); setConnection(false, "Degradado"); } }
+      state.timers = window.HaierUiState.mergeTimerMutations(timers, state.timerMutations); showError(""); render(); setConnection(true, "Online");
+    } catch (error) { if (error.message !== "unauthorized") { showError(error.message); setConnection(false, "Degraded"); } }
     finally { state.refreshPromise = null; }
   })();
   return state.refreshPromise;
@@ -344,23 +344,24 @@ async function boot() {
   let plan = { action: "token" };
   try {
     const health = await fetch("/healthz", { cache:"no-store" }).then(response => response.json());
+    if (health.driver === "mock") $("#environmentLabel").textContent = "DEMO · SIMULATED DEVICES";
     state.trustedNetwork = Boolean(health.trusted_network);
     const setup = await fetch("/api/v1/setup/haier/status", { cache:"no-store" }).then(response => response.json());
     plan = window.HaierUiState.decideBootAction({ health, setup, session: state });
   } catch (_) {
-    setConnection(false, "Sin conexión");
+    setConnection(false, "Offline");
     plan = { action: window.HaierUiState.needsLocalToken(state) ? "token" : "dashboard" };
   }
   if (plan.storeToken) await rememberSetupToken(plan.storeToken);
   if (plan.action === "otp") {
     state.setupFlow = plan.flow;
     $("#credentialsStep").classList.add("hidden"); $("#otpStep").classList.remove("hidden");
-    $("#setupEyebrow").textContent = "DOBLE FACTOR"; $("#setupTitle").textContent = "Revisa tu correo";
-    $("#haierSetupSubmit").textContent = "Verificar y conectar"; $("#haierSetupDialog").showModal(); return;
+    $("#setupEyebrow").textContent = "TWO-FACTOR VERIFICATION"; $("#setupTitle").textContent = "Check your email";
+    $("#haierSetupSubmit").textContent = "Verify and connect"; $("#haierSetupDialog").showModal(); return;
   }
   if (plan.action === "haier-setup") {
-    $("#setupEyebrow").textContent = plan.reconnect ? "RECONECTAR" : "CONFIGURACIÓN INICIAL";
-    $("#setupTitle").textContent = plan.reconnect ? "Reconectar con hOn" : "Conectar con hOn";
+    $("#setupEyebrow").textContent = plan.reconnect ? "RECONNECT" : "INITIAL SETUP";
+    $("#setupTitle").textContent = plan.reconnect ? "Reconnect to hOn" : "Connect to hOn";
     if (plan.message) $("#haierSetupError").textContent = plan.message;
     $("#haierSetupDialog").showModal(); return;
   }

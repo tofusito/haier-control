@@ -102,7 +102,7 @@ async def test_recorded_context_fills_every_state_field_the_cards_show(
     assert state.power is not None
     assert state.mode is not None
     assert state.target_temperature is not None
-    # The bug that showed "Sin dato de ambiente": tempIndoor lives in the shadow.
+    # The bug that showed "Room temperature unavailable": tempIndoor lives in the shadow.
     assert state.room_temperature is not None
     assert state.fan_mode is not None
     assert state.advanced, "advanced toggles must be reported, not silently empty"

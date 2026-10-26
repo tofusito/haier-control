@@ -1,28 +1,29 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#09111f" />
     <meta name="color-scheme" content="dark" />
-    <title>Clima · Haier Control</title>
+    <title>Climate · Haier Control</title>
+    <link rel="icon" type="image/svg+xml" href="/static/icon.svg" />
     <link rel="stylesheet" href="/static/styles.css" />
   </head>
   <body>
     <div class="ambient" aria-hidden="true"></div>
     <header class="topbar">
       <div>
-        <p class="eyebrow">MI CASA</p>
-        <h1>Clima</h1>
+        <p class="eyebrow" id="environmentLabel">YOUR HOME</p>
+        <h1>Climate</h1>
       </div>
-      <button id="connectionButton" class="status-pill" type="button" aria-label="Estado de conexión">
-        <span class="status-dot"></span><span id="connectionLabel">Conectando</span>
+      <button id="connectionButton" class="status-pill" type="button" aria-label="Connection status">
+        <span class="status-dot"></span><span id="connectionLabel">Connecting</span>
       </button>
     </header>
 
     <main>
       <section id="errorBanner" class="banner hidden" role="alert"></section>
-      <nav id="deviceSwitcher" class="device-switcher" aria-label="Seleccionar aire acondicionado"></nav>
+      <nav id="deviceSwitcher" class="device-switcher" aria-label="Select air conditioner"></nav>
       <section id="devices" class="device-grid" aria-live="polite">
         <article class="skeleton-card"></article>
         <article class="skeleton-card"></article>
@@ -32,25 +33,25 @@
     <dialog id="tokenDialog" class="sheet token-sheet">
       <form id="tokenForm" method="dialog">
         <div class="sheet-handle" aria-hidden="true"></div>
-        <p class="eyebrow">ACCESO LOCAL</p>
-        <h2>Conecta este dispositivo</h2>
+        <p class="eyebrow">LOCAL ACCESS</p>
+        <h2>Connect this browser</h2>
         <p class="muted">
-          Pega un token local con permisos <code>read</code>, <code>control</code> y
-          <code>timers</code>. No uses tu contraseña de hOn aquí.
+          Paste a local API token with <code>read</code>, <code>control</code> and
+          <code>timers</code> permissions. Do not enter your hOn password here.
         </p>
         <label>
-          Token de API
+          API token
           <input id="apiToken" type="password" autocomplete="off" required placeholder="hc_…" />
         </label>
         <label class="check-row">
           <input id="rememberToken" type="checkbox" />
-          <span>Recordar en este navegador</span>
+          <span>Remember in this browser</span>
         </label>
         <p id="tokenError" class="field-error" role="alert"></p>
-        <button class="primary wide" type="submit">Entrar</button>
+        <button class="primary wide" type="submit">Continue</button>
         <p class="security-note">
-          La opción más segura para el primer token es la CLI dentro del contenedor. HTTP
-          en una LAN no cifra el tráfico; para redes no confiables usa HTTPS local.
+          Generate your first token with the CLI inside the container. HTTP does not
+          encrypt traffic; use local HTTPS on networks you do not trust.
         </p>
       </form>
     </dialog>
@@ -58,43 +59,43 @@
     <dialog id="haierSetupDialog" class="sheet token-sheet">
       <form id="haierSetupForm" method="dialog" autocomplete="on">
         <div class="sheet-handle" aria-hidden="true"></div>
-        <p class="eyebrow" id="setupEyebrow">CONFIGURACIÓN INICIAL</p>
-        <h2 id="setupTitle">Conectar con hOn</h2>
+        <p class="eyebrow" id="setupEyebrow">INITIAL SETUP</p>
+        <h2 id="setupTitle">Connect to hOn</h2>
         <p class="muted">
-          Este es un formulario propio de Haier Control: el servidor habla directamente con
-          hOn. No es una página oficial incrustada.
+          This form belongs to Haier Control. Your server connects directly to hOn;
+          this is not an embedded official sign-in page.
         </p>
         <div class="banner setup-warning">
-          Esta primera versión usa HTTP. Introduce credenciales solo desde una LAN de
-          confianza. Para máxima protección, usa la CLI o configura HTTPS local.
+          Only enter credentials over a trusted connection. For stronger protection,
+          use the CLI or configure local HTTPS.
         </div>
         <div id="credentialsStep" class="field-grid">
           <label>
-            Token de emparejamiento
-            <input id="pairingToken" type="password" autocomplete="off" required placeholder="Consulta el log del contenedor" />
+            Pairing token
+            <input id="pairingToken" type="password" autocomplete="off" required placeholder="Check the container log" />
           </label>
           <label>
-            Email de hOn
+            hOn email
             <input id="haierEmail" type="email" autocomplete="username" required />
           </label>
           <label>
-            Contraseña de hOn
+            hOn password
             <input id="haierPassword" type="password" autocomplete="current-password" required />
           </label>
         </div>
         <div id="otpStep" class="field-grid hidden">
-          <p class="muted">hOn ha enviado un código al correo de la cuenta.</p>
+          <p class="muted">hOn sent a code to your account email.</p>
           <label>
-            Código de verificación
+            Verification code
             <input id="haierOtp" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" />
           </label>
-          <button id="resendOtp" type="button" class="control-button">Reenviar código</button>
+          <button id="resendOtp" type="button" class="control-button">Resend code</button>
         </div>
         <p id="haierSetupError" class="field-error" role="alert"></p>
-        <button id="haierSetupSubmit" class="primary wide" type="submit">Conectar de forma segura</button>
+        <button id="haierSetupSubmit" class="primary wide" type="submit">Connect</button>
         <p class="security-note">
-          La contraseña solo vive en memoria durante el handshake. Se guardan únicamente
-          tokens de sesión cifrados; una reautenticación completa volverá a pedirla.
+          Interactive pairing saves encrypted session tokens, not your password.
+          Optional automatic recovery stores separately configured credentials encrypted on this host.
         </p>
       </form>
     </dialog>
@@ -104,26 +105,26 @@
         <div class="sheet-handle" aria-hidden="true"></div>
         <div class="sheet-title-row">
           <div>
-            <p class="eyebrow">TEMPORIZADOR</p>
-            <h2 id="timerTitle">Programar</h2>
+            <p class="eyebrow">TIMER</p>
+            <h2 id="timerTitle">Schedule</h2>
           </div>
-          <button class="icon-button" value="cancel" aria-label="Cerrar" type="button" data-close>×</button>
+          <button class="icon-button" value="cancel" aria-label="Close" type="button" data-close>×</button>
         </div>
         <input id="timerDeviceId" type="hidden" />
         <input id="timerEditId" type="hidden" />
         <fieldset class="segmented">
-          <legend class="sr-only">Acción</legend>
-          <label><input type="radio" name="timerAction" value="off" checked /><span>Apagar</span></label>
-          <label><input type="radio" name="timerAction" value="on" /><span>Encender</span></label>
+          <legend class="sr-only">Action</legend>
+          <label><input type="radio" name="timerAction" value="off" checked /><span>Turn off</span></label>
+          <label><input type="radio" name="timerAction" value="on" /><span>Turn on</span></label>
         </fieldset>
         <fieldset class="segmented compact">
-          <legend class="sr-only">Tipo de hora</legend>
-          <label><input type="radio" name="timerKind" value="relative" checked /><span>En unos minutos</span></label>
-          <label><input type="radio" name="timerKind" value="exact" /><span>A una hora</span></label>
+          <legend class="sr-only">Timer type</legend>
+          <label><input type="radio" name="timerKind" value="relative" checked /><span>After a delay</span></label>
+          <label><input type="radio" name="timerKind" value="exact" /><span>At a set time</span></label>
         </fieldset>
         <div id="relativeFields" class="field-grid">
-          <label>Minutos<input id="timerMinutes" type="number" min="1" max="10080" value="30" /></label>
-          <div class="quick-times" aria-label="Tiempos rápidos">
+          <label>Minutes<input id="timerMinutes" type="number" min="1" max="10080" value="30" /></label>
+          <div class="quick-times" aria-label="Quick durations">
             <button type="button" data-minutes="15">15 m</button>
             <button type="button" data-minutes="30">30 m</button>
             <button type="button" data-minutes="60">1 h</button>
@@ -131,21 +132,21 @@
           </div>
         </div>
         <div id="exactFields" class="hidden">
-          <label>Fecha y hora<input id="timerExact" type="datetime-local" /></label>
+          <label>Date and time<input id="timerExact" type="datetime-local" /></label>
         </div>
         <div id="onOptions" class="on-options hidden">
           <div class="divider"></div>
-          <h3>Al encender</h3>
+          <h3>Turn-on settings</h3>
           <div class="field-grid two">
-            <label>Modo<select id="timerMode"></select></label>
-            <label>Temperatura<input id="timerTemperature" type="number" inputmode="decimal" /></label>
-            <label>Ventilador<select id="timerFan"></select></label>
+            <label>Mode<select id="timerMode"></select></label>
+            <label>Temperature<input id="timerTemperature" type="number" inputmode="decimal" /></label>
+            <label>Fan<select id="timerFan"></select></label>
           </div>
         </div>
         <p id="timerError" class="field-error" role="alert"></p>
         <div class="form-actions">
-          <button id="deleteTimerButton" class="danger-button wide hidden" type="button">Eliminar temporizador</button>
-          <button class="primary wide" type="submit">Guardar temporizador</button>
+          <button id="deleteTimerButton" class="danger-button wide hidden" type="button">Delete timer</button>
+          <button class="primary wide" type="submit">Save timer</button>
         </div>
       </form>
     </dialog>
@@ -153,8 +154,8 @@
     <dialog id="moreDialog" class="sheet">
       <div class="sheet-handle" aria-hidden="true"></div>
       <div class="sheet-title-row">
-        <div><p class="eyebrow">CONTROLES</p><h2 id="moreTitle">Más</h2></div>
-        <button class="icon-button" aria-label="Cerrar" type="button" data-close>×</button>
+        <div><p class="eyebrow">CONTROLS</p><h2 id="moreTitle">More</h2></div>
+        <button class="icon-button" aria-label="Close" type="button" data-close>×</button>
       </div>
       <div id="advancedControls" class="advanced-list"></div>
     </dialog>

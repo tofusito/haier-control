@@ -10,7 +10,7 @@ can change without notice.
 - Device discovery through the hOn appliance list.
 - State reads through the hOn command/context endpoints.
 - Capability-aware controls exposed by the device schema.
-- REST polling for eventual state reconciliation.
+- On-demand REST reads for state reconciliation; no continuous background poll yet.
 
 ## What is not promised
 

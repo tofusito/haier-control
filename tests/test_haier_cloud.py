@@ -42,7 +42,7 @@ async def test_list_devices_reads_the_type_field_the_cloud_actually_sends(
                                     {
                                         "applianceTypeName": "AC",
                                         "macAddress": "AA:BB:CC:DD:EE:FF",
-                                        "nickName": "Salón",
+                                        "nickName": "Living room",
                                         "applianceModelId": "123",
                                     },
                                     {
@@ -65,7 +65,7 @@ async def test_list_devices_reads_the_type_field_the_cloud_actually_sends(
     finally:
         await driver.close()
 
-    assert [device.name for device in devices] == ["Salón"]
+    assert [device.name for device in devices] == ["Living room"]
 
 
 @pytest.mark.asyncio
@@ -117,7 +117,7 @@ async def test_list_devices_reads_capabilities_from_set_parameters(
                                     {
                                         "applianceTypeName": "AC",
                                         "macAddress": "AA:BB:CC:DD:EE:FF",
-                                        "nickName": "Salón",
+                                        "nickName": "Living room",
                                     }
                                 ]
                             }
@@ -161,7 +161,7 @@ async def test_get_state_reads_room_temperature_from_the_shadow_not_the_envelope
     tmp_path: Path,
 ) -> None:
     """Reproduces the real symptom: both AC cards showed live power/mode/target
-    temperature but "Sin dato de ambiente" (no room temperature) even after the
+    temperature but "Room temperature unavailable" (no room temperature) even after the
     discovery and capability fixes. /commands/v1/context nests tempIndoor inside
     shadow.parameters alongside machMode/tempSel/windSpeed -- confirmed live --
     not in the response's top-level envelope where the old code read it.
@@ -179,7 +179,7 @@ async def test_get_state_reads_room_temperature_from_the_shadow_not_the_envelope
                                     {
                                         "applianceTypeName": "AC",
                                         "macAddress": "AA:BB:CC:DD:EE:FF",
-                                        "nickName": "Salón",
+                                        "nickName": "Living room",
                                     }
                                 ]
                             }

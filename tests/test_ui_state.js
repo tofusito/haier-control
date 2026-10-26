@@ -12,7 +12,7 @@ const {
 function device(state = {}) {
   return {
     id: "salon",
-    name: "AC Salón",
+    name: "AC Living room",
     state: {
       power: false,
       mode: "cool",
@@ -76,10 +76,10 @@ test("power is reflected immediately and consolidates after acceptance", async (
   assert.equal(h.state.pendingCommands.has("salon"), true);
   assert.deepEqual(presentPowerState(h.state.devices[0], true), {
     pressed: true,
-    label: "Encendido",
-    ariaLabel: "Apagar AC Salón",
-    caption: "Encendido · cool",
-    status: "Sincronizando…",
+    label: "On",
+    ariaLabel: "Turn off AC Living room",
+    caption: "On · cool",
+    status: "Syncing…",
   });
   assert.equal(calls.length, 1);
   assert.match(calls[0].options.body, /"operation":"power"/);
@@ -89,7 +89,7 @@ test("power is reflected immediately and consolidates after acceptance", async (
   assert.equal(result.status, "accepted");
   assert.equal(h.state.pendingCommands.size, 0);
   assert.equal(h.state.devices[0].state.power, true);
-  assert.deepEqual(h.toasts, ["Cambio confirmado"]);
+  assert.deepEqual(h.toasts, ["Change confirmed"]);
   assert.deepEqual(h.refreshes, [1200]);
 });
 
@@ -103,14 +103,14 @@ test("a stale SSE response cannot overwrite an accepted response that included s
 });
 
 test("a rejected command rolls back and leaves a clear retry path", async () => {
-  const h = harness({ api: async () => { throw new Error("Haier no aceptó el cambio"); } });
+  const h = harness({ api: async () => { throw new Error("Haier did not accept the change"); } });
 
   const result = await h.controller.send("salon", "power", true);
   assert.equal(result.status, "failed");
   assert.equal(h.state.devices[0].state.power, false);
   assert.equal(h.state.pendingCommands.size, 0);
-  assert.match(h.errors[0], /reintentarlo/);
-  assert.deepEqual(h.toasts, ["No se pudo aplicar · reintenta"]);
+  assert.match(h.errors[0], /try again/);
+  assert.deepEqual(h.toasts, ["Could not apply · try again"]);
 });
 
 test("a timeout aborts the request, rolls back, and re-enables retry", async () => {
@@ -129,7 +129,7 @@ test("a timeout aborts the request, rolls back, and re-enables retry", async () 
   assert.equal(result.status, "timeout");
   assert.equal(h.state.devices[0].state.power, false);
   assert.equal(h.state.pendingCommands.size, 0);
-  assert.match(h.errors[0], /reintentarlo/);
+  assert.match(h.errors[0], /try again/);
   assert.deepEqual(h.refreshes, [1200]);
 });
 
@@ -282,13 +282,13 @@ test("boot opens the hOn setup, and calls it a reconnect only when a session exi
   });
   const again = decideBootAction({
     health: { setup_required: true },
-    setup: { status: "failed", message: "hOn rechazó el acceso" },
+    setup: { status: "failed", message: "hOn rejected the login" },
     session: { token: "hc_existing", trustedNetwork: false },
   });
   assert.equal(fresh.action, "haier-setup");
   assert.equal(fresh.reconnect, false);
   assert.equal(again.reconnect, true);
-  assert.equal(again.message, "hOn rechazó el acceso");
+  assert.equal(again.message, "hOn rejected the login");
 });
 
 test("boot carries the OTP challenge through to the dialog", () => {

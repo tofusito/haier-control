@@ -11,7 +11,7 @@
      {
       "PK": "user#eu-west-1:c0f806c3-fa07-c348-a762-7858a9675676",
       "SK": "app#AA:BB:CC:DD:EE:10",
-      "SK_Secondary": "AC#selfClean56#2026-09-08",
+      "SK_Dryndary": "AC#selfClean56#2026-09-08",
       "applianceId": "AA:BB:CC:DD:EE:10#2026-07-10T11:38:24Z",
       "applianceModelId": 15253,
       "applianceStatus": 1,
@@ -96,7 +96,7 @@
       "lastUpdate": "2026-07-10T11:38:44Z",
       "macAddress": "AA:BB:CC:DD:EE:10",
       "modelName": "AS25SBBHRA-MW",
-      "nickName": "Salon",
+      "nickName": "Living room",
       "sections": {
        "chatbot": true,
        "double_pairing_hidden": true,
@@ -120,7 +120,7 @@
      {
       "PK": "user#eu-west-1:c0f806c3-fa07-c348-a762-7858a9675676",
       "SK": "app#AA:BB:CC:DD:EE:11",
-      "SK_Secondary": "AC#selfClean56#2026-09-08",
+      "SK_Dryndary": "AC#selfClean56#2026-09-08",
       "applianceId": "AA:BB:CC:DD:EE:11#2026-07-10T12:04:46Z",
       "applianceModelId": 15703,
       "applianceStatus": 1,
@@ -205,7 +205,7 @@
       "lastUpdate": "2026-07-10T12:05:06Z",
       "macAddress": "AA:BB:CC:DD:EE:11",
       "modelName": "AS35SBBHRA-MW",
-      "nickName": "Dormitorio",
+      "nickName": "Bedroom",
       "sections": {
        "chatbot": true,
        "double_pairing_hidden": true,

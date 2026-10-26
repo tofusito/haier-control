@@ -1,170 +1,140 @@
-# Haier Control
+<p align="center">
+  <img src="app/static/icon.svg" width="72" height="72" alt="" />
+</p>
 
-[![CI](https://github.com/tofusito/haier-control/actions/workflows/ci.yml/badge.svg)](https://github.com/tofusito/haier-control/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-3776AB.svg)](pyproject.toml)
+<h1 align="center">Haier Control</h1>
+<p align="center"><strong>Your home's climate, at a glance.</strong><br>
+An independent, self-hosted dashboard for Haier hOn air conditioners.</p>
 
-A self-hosted, mobile-first dashboard for controlling Haier hOn air conditioners.
-Haier Control is local-first: the UI, API, timers, audit history and encrypted session
-state run on your own machine, while live device communication uses the hOn cloud.
+<p align="center">
+  <a href="https://github.com/tofusito/haier-control/actions/workflows/ci.yml"><img src="https://github.com/tofusito/haier-control/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT license" /></a>
+  <a href="pyproject.toml"><img src="https://img.shields.io/badge/python-3.12%2B-3776AB.svg" alt="Python 3.12 or newer" /></a>
+</p>
 
-> [!WARNING]
-> The hOn cloud API is private and unofficial. It can change without notice. This project
-> never treats a malformed response or an unconfirmed command as success.
+<p align="center">
+  <a href="#try-the-demo">Try the demo</a> ·
+  <a href="docs/product-overview.md">Product overview</a> ·
+  <a href="docs/README.md">Documentation</a> ·
+  <a href="CONTRIBUTING.md">Contribute</a>
+</p>
 
-## What works in v0.1
+![Desktop dashboard showing two simulated air conditioners](docs/images/dashboard-desktop.png)
 
-The default setup uses a mock driver and sends no commands to a real appliance.
+*Actual application, using simulated devices. All interface text is in English.*
 
-- Responsive mobile dashboard with mode-specific visual language, target and room
-  temperature, fan, swing, advanced controls, reduced-motion support, and honest stale or
-  degraded states. Mobile uses a compact AC selector with a preview for each unit.
-- Controls update optimistically while the cloud confirms. Power, temperature, mode, fan,
-  swing, and advanced settings prevent duplicate taps, show synchronization, and roll back
-  with a retry message after a rejected or timed-out request.
-- Persistent timers to turn a unit on or off after N minutes or at an exact date/time.
-  Turn-on timers may include mode, target temperature, fan, swing, and advanced options;
-  scheduled timers can be edited or cancelled without deleting their audit history.
-- Stable versioned API for devices, commands, timers, SSE updates, and authenticated
-  OpenAPI at `/api/v1/openapi.json`.
-- API tokens are random and authenticated by keyed hashes, with `read`, `control`, and
-  `timers` scopes. Commands are rate-limited, deduplicated, and audited.
-- `MockDriver` is fully functional. `HaierCloudDriver` is opt-in and uses REST polling;
-  MQTT realtime is a documented future enhancement.
-- hOn login through encrypted-session reuse, private credential files, direct environment
-  variables, CLI, or a short-lived web pairing flow, including Salesforce email OTP.
+## Why it exists
 
-## Architecture
+I built Haier Control as a Haier customer who wanted a focused interface for everyday
+air-conditioning tasks: see the temperature, adjust a setting and schedule a timer.
+The project explores how a small, responsive web dashboard can make those tasks clearer.
 
-The domain and API depend only on a `Driver` contract. `MockDriver` and
-`HaierCloudDriver` sit behind it, so future Home Assistant, ESPHome/local, or other
-connectors do not change the UI, timers, or local API.
+This is a working independent prototype, offered as a starting point for user feedback
+and product discussion. It is not an official Haier application.
 
-```text
-mobile web / integrations
-        |
-authenticated API + SSE
-        |
-controller -- persistent scheduler -- SQLite /data
-        |
-Driver interface
-   |             |
-MockDriver   HaierCloudDriver -> private hOn cloud
+## Designed for everyday control
+
+| | |
+| --- | --- |
+| **A clear view of every room** | Target and room temperatures, power and mode at a glance. A compact selector on mobile; side-by-side cards on desktop. |
+| **Controls that fit the appliance** | Modes, fan speeds, swing and advanced options follow the capabilities the device reports. |
+| **Immediate, honest feedback** | Controls respond immediately while a request is pending. Rejected or timed-out requests roll back and show a retry message. |
+| **Timers that live on your server** | Schedule power on or off by duration or date/time. Edit or cancel timers without erasing their history. |
+| **An integration-friendly core** | A versioned API, scoped access tokens, local SSE updates and interchangeable device drivers. |
+
+<details>
+<summary>Mobile preview</summary>
+<p align="center"><img src="docs/images/dashboard-mobile.png" width="320" alt="Mobile dashboard with a compact room selector and English controls" /></p>
+</details>
+
+## Try the demo
+
+No appliance account or Docker installation is needed. From a fresh checkout:
+
+```sh
+git clone https://github.com/tofusito/haier-control.git
+cd haier-control
+python3 -m venv .venv
+. .venv/bin/activate
+pip install -e .
+python -m scripts.demo
 ```
 
-See [architecture](docs/architecture.md), [protocol notes](docs/haier-protocol.md),
-[security](docs/security.md), and [deployment](docs/deployment.md).
+Requires Python 3.12 or newer. Open **http://127.0.0.1:8788**.
 
-For model coverage and known boundaries, see [compatibility](docs/compatibility.md).
+The demo always uses simulated devices, binds to loopback and creates temporary runtime
+data. It cannot send commands to real appliances. Demo state resets when you stop it.
+To use a different local port, run `python -m scripts.demo --port 8789`.
 
-## Local quick start (mock)
+See the [five-minute walkthrough](docs/demo.md) for a suggested evaluation sequence.
+
+## Run with Docker
+
+The default Compose service also uses simulated devices. For a **new installation**:
 
 ```sh
 mkdir -p data secrets
 chmod 700 data secrets
-python -c 'import secrets; print(secrets.token_urlsafe(48))' > secrets/master_key
-chmod 600 secrets/master_key
+python3 -c 'import os, secrets; f = os.open("secrets/master_key", os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600); os.write(f, secrets.token_urlsafe(48).encode()); os.close(f)'
 docker compose up --build -d
 docker compose exec haier-control haier-control token --name browser
 ```
 
-Open `http://127.0.0.1:8787` and paste the token printed once by the CLI.
+Open **http://127.0.0.1:8787** and paste the generated API token. The key command refuses
+to overwrite an existing master key. Keep that key for every subsequent update.
 
-To try direct hOn access, set `HAIER_DRIVER=haier-cloud` before creating the container.
-The container prints a one-use pairing token valid for ten minutes. Open the web UI,
-choose **Conectar con hOn**, and enter the pairing token plus hOn credentials. If email
-OTP is enabled, the same flow prompts for the code. This form belongs to Haier Control;
-it is not an embedded official page.
+For real appliances, select `HAIER_DRIVER=haier-cloud` and follow the
+[hOn setup guide](docs/configuration.md#connecting-to-hon). hOn remains necessary for live
+state and control; hosting the dashboard locally does not make the appliances work offline.
 
-The web setup over HTTP should only be used on a trusted LAN. For stronger protection,
-bootstrap inside the container instead:
-
-```sh
-docker compose exec haier-control haier-control auth
-```
-
-See [configuration](docs/configuration.md) for the full settings reference.
-
-### Optional automatic hOn login
-
-Configure the credentials once and keep `/data` plus the separate master key across
-deployments. Haier Control reuses encrypted session tokens, saves refreshed tokens, and
-recovers a rejected refresh using its encrypted credential copy. File inputs take precedence
-over environment inputs and update that copy at startup. Network failures do not trigger
-password login; failed recovery backs off for five minutes. MFA may still require a code.
-
-AC identifiers, models and capabilities are encrypted locally and reconciled hourly.
-The first browser token is remembered automatically in localStorage and is only marked
-delivered after browser acknowledgment. Existing local tokens remain valid on upgrade.
-The cloud is still required for live state and control.
-
-### Trusted home-network browser access (optional)
-
-For a household deployment reachable only through the home Wi-Fi and Tailscale, enable
-the explicit trusted-network mode and list the source networks:
-
-```yaml
-environment:
-  HAIER_TRUSTED_NETWORK_MODE: "true"
-  HAIER_TRUSTED_NETWORK_CIDRS: "<home-cidr>,100.64.0.0/10,<tailnet-ipv6-cidr>"
-```
-
-The dashboard then receives a signed, `HttpOnly` browser session cookie on the trusted
-network. No hOn credential, master key, or local API token is placed in the page, and a
-new browser opens the dashboard without a token prompt. Bearer API tokens remain available
-for integrations. The root dashboard and hOn setup flow reject clients outside the listed
-networks; do not enable this mode behind a public reverse proxy or internet tunnel.
-
-If a host-managed root-only Compose file owns the service, the same setting can be persisted in the
-dedicated `/data/haier-trusted-network.conf` file (mode `0600`):
+## How it fits together
 
 ```text
-mode=trusted
-cidrs=<home-cidr>,100.64.0.0/10,<tailnet-ipv6-cidr>
+Browser / integrations
+          |
+    Local API + SSE
+          |
+  Controller ── Scheduler ── SQLite
+          |
+     Driver contract
+       /         \
+ MockDriver    HaierCloudDriver ── hOn cloud ── Air conditioners
 ```
 
-The marker is deployment-local configuration, contains no secret, and is ignored when
-the corresponding environment settings were explicitly supplied. Remove it to return to
-Bearer-token browser authentication.
+The dashboard, API, scheduler and persistence run on your host. The cloud driver handles
+authentication, discovery, state reads and commands. Home Assistant is not required.
 
-Recommended file mode:
+## Current scope
 
-```yaml
-environment:
-  HAIER_HON_EMAIL_FILE: /run/secrets/haier_hon_email
-  HAIER_HON_PASSWORD_FILE: /run/secrets/haier_hon_password
-volumes:
-  - ./secrets/hon_email:/run/secrets/haier_hon_email:ro
-  - ./secrets/hon_password:/run/secrets/haier_hon_password:ro
-```
+- **Implemented:** mock and cloud drivers, mobile and desktop UI, timers, encrypted
+  session recovery, local authentication and capability-aware controls.
+- **Limited compatibility:** settings-based AC command schemas are supported.
+  Program-based command families and broad model coverage remain future work.
+- **State updates:** hOn state is read over REST when requested. Local SSE announces
+  changes processed by this app; it is not a vendor realtime feed. Physical-remote
+  changes may require a manual refresh. Continuous background polling and MQTT are
+  not implemented.
+- **Validation boundary:** automated checks exercise mock devices and redacted cloud
+  fixtures. They do not certify appliance behavior across models or run physical commands.
+- **Deployment:** intended for a private LAN or tailnet, with explicit authentication.
 
-Both host files must be regular files with mode `0600`. Keep them outside Git and `/data`.
-The process imports them into its encrypted recovery file, clears temporary references,
-and never logs their contents. Back up `/data` and the master key separately.
+The hOn API is private and unofficial. It may change without notice. See
+[compatibility](docs/compatibility.md), the [security model](docs/security.md) and
+[roadmap](ROADMAP.md) for the remaining work.
 
-For a hobby installation that accepts a weaker host-side boundary, set both
-`HAIER_HON_EMAIL` and `HAIER_HON_PASSWORD`. Docker inspect, Compose output, and
-host administrators can read direct environment values in clear text. Haier Control never
-prints them, but cannot hide them from Docker. Do not combine direct values with file mode;
-the complete file pair wins.
+## Documentation and contribution
 
-## Development
+Start with the [documentation index](docs/README.md) or [CONTRIBUTING.md](CONTRIBUTING.md).
+The repository includes architecture, configuration, deployment, troubleshooting,
+protocol provenance and a [changelog](CHANGELOG.md).
 
-```sh
-python -m venv .venv
-. .venv/bin/activate
-pip install -e '.[dev]'
-ruff check .
-mypy app
-pytest
-```
+Security concerns should be reported through the channels in [SECURITY.md](SECURITY.md).
 
-## License and provenance
+## License and independence
 
-Haier Control is MIT licensed. It does not copy code from addhOn. Wire-level
-interoperability facts are independently implemented from addhOn's public protocol
-specification and are recorded in [the protocol notes](docs/haier-protocol.md). addhOn
-itself is AGPL-3.0. Haier and hOn are trademarks of their respective owners; this project
-is not affiliated with or endorsed by Haier.
+[MIT licensed](LICENSE). Haier Control independently implements interoperability facts
+documented in the public addhOn protocol specification; it contains no copied addhOn code.
+See the [protocol notes](docs/haier-protocol.md) for attribution and scope.
 
-Contributors are expected to follow the project's [Code of Conduct](CODE_OF_CONDUCT.md).
+Haier and hOn are trademarks of their respective owners. This project is not affiliated
+with or endorsed by Haier. Contributors follow the [Code of Conduct](CODE_OF_CONDUCT.md).
